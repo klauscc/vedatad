@@ -1,8 +1,9 @@
 import argparse
+import os
 
 import torch
 
-from vedacore.fileio import dump
+from vedacore.fileio import dump, load
 from vedacore.misc import Config, DictAction, ProgressBar, load_weights
 from vedacore.parallel import MMDataParallel
 from vedatad.datasets import build_dataloader, build_dataset
@@ -14,12 +15,11 @@ def parse_args():
     parser.add_argument('config', help='test config file path')
     parser.add_argument('checkpoint', help='checkpoint file')
     parser.add_argument('--out', help='output result file in pickle format')
-    parser.add_argument(
-        '--eval-options',
-        nargs='+',
-        action=DictAction,
-        help='custom options for evaluation, the key-value pair in xxx=yyy '
-        'format will be kwargs for dataset.evaluate() function')
+    parser.add_argument('--eval-options',
+                        nargs='+',
+                        action=DictAction,
+                        help='custom options for evaluation, the key-value pair in xxx=yyy '
+                        'format will be kwargs for dataset.evaluate() function')
 
     args = parser.parse_args()
     return args
@@ -31,8 +31,7 @@ def prepare(cfg, checkpoint):
     load_weights(engine.model, checkpoint, map_location='cpu')
 
     device = torch.cuda.current_device()
-    engine = MMDataParallel(
-        engine.to(device), device_ids=[torch.cuda.current_device()])
+    engine = MMDataParallel(engine.to(device), device_ids=[torch.cuda.current_device()])
 
     dataset = build_dataset(cfg.data.val, dict(test_mode=True))
     dataloader = build_dataloader(dataset, 1, 1, dist=False, shuffle=False)
@@ -62,19 +61,26 @@ def main():
     args = parse_args()
     cfg = Config.fromfile(args.config)
 
+    if args.out is None:
+        raise ValueError('The output file must not be None')
+
     if args.out is not None and not args.out.endswith(('.pkl', '.pickle')):
         raise ValueError('The output file must be a pkl file.')
 
     engine, data_loader = prepare(cfg, args.checkpoint)
 
-    results = test(engine, data_loader)
-
-    if args.out:
+    if not os.path.isfile(args.out):
+        results = test(engine, data_loader)
         print(f'\nwriting results to {args.out}')
         dump(results, args.out)
+    else:
+        results = load(args.out)
 
-    kwargs = dict() if args.eval_options is None else args.eval_options
-    data_loader.dataset.evaluate(results, **kwargs)
+    # kwargs = dict() if args.eval_options is None else args.eval_options
+    for iou_thr in [0.3, 0.4, 0.5, 0.6, 0.7]:
+        kwargs = dict(iou_thr=iou_thr)
+        print(f'======iou_thr:{iou_thr}=====')
+        data_loader.dataset.evaluate(results, **kwargs)
 
 
 if __name__ == '__main__':

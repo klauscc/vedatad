@@ -4,7 +4,7 @@ data_root = "data/thumos14/"
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True
 )
-num_frames = 768
+num_frames = 480
 img_shape = (112, 112)
 overlap_ratio = 0.25
 
@@ -14,7 +14,7 @@ data = dict(
     train=dict(
         typename=dataset_type,
         ann_file=data_root + "annotations/val.json",
-        video_prefix=data_root + "frames/val",
+        video_prefix=data_root + "frames_15fps/val",
         pipeline=[
             dict(typename="LoadMetaInfo"),
             dict(typename="LoadAnnotations"),
@@ -44,7 +44,7 @@ data = dict(
     val=dict(
         typename=dataset_type,
         ann_file=data_root + "annotations/test.json",
-        video_prefix=data_root + "frames/test",
+        video_prefix=data_root + "frames_15fps/test",
         pipeline=[
             dict(typename="LoadMetaInfo"),
             dict(typename="Time2Frame"),
@@ -77,22 +77,28 @@ num_anchors = scales_per_octave
 model = dict(
     typename="SingleStageDetector",
     backbone=dict(
-        typename="ResNet3d",
-        depth=50,
-        norm_eval=True,
-        out_indices=(3,),
-        frozen_stages=1,
-        inflate=((1, 1, 1), (1, 0, 1, 0), (1, 0, 1, 0, 1, 0), (0, 1, 0)),
-        zero_init_residual=False,
+        typename="SwinTransformer3D",
+        patch_size=(2, 4, 4),
+        in_chans=3,
+        embed_dim=96,
+        drop_path_rate=0.1,
+        depths=[2, 2, 6, 2],
+        num_heads=[3, 6, 12, 24],
+        window_size=(8, 7, 7),
+        patch_norm=True,
+        frozen_stages=2,
     ),
     neck=[
         dict(
-            typename="SRM",
-            srm_cfg=dict(typename="AdaptiveAvgPool3d", output_size=(None, 1, 1)),
+            typename="SRMSwin",
+            srm_cfg=dict(
+                in_channels=768,
+                out_channels=512,
+            ),
         ),
         dict(
             typename="TDM",
-            in_channels=2048,
+            in_channels=512,
             stage_layers=(1, 1, 1, 1),
             out_channels=512,
             conv_cfg=dict(typename="Conv1d"),
@@ -102,7 +108,7 @@ model = dict(
         ),
         dict(
             typename="FPN",
-            in_channels=[2048, 512, 512, 512, 512],
+            in_channels=[512, 512, 512, 512, 512],
             out_channels=256,
             num_outs=5,
             start_level=0,
@@ -215,7 +221,10 @@ modes = ["train"]
 max_epochs = 1200
 
 # 6. checkpoint
-weights = dict(filepath="open-mmlab://i3d_r50_256p_32x2x1_100e_kinetics400_rgb")
+# weights = dict(filepath='open-mmlab://i3d_r50_256p_32x2x1_100e_kinetics400_rgb')
+weights = dict(
+    filepath="data/pretrained_models/vswin/swin_tiny_patch244_window877_kinetics400_1k_keysfrom_backbone.pth"
+)
 # optimizer = dict(filepath='epoch_900_optim.pth')
 # meta = dict(filepath='epoch_900_meta.pth')
 
@@ -223,5 +232,5 @@ weights = dict(filepath="open-mmlab://i3d_r50_256p_32x2x1_100e_kinetics400_rgb")
 seed = 10
 dist_params = dict(backend="nccl")
 log_level = "INFO"
-find_unused_parameters = True
+find_unused_parameters = False
 deterministic = True

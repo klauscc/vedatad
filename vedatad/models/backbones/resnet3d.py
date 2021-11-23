@@ -7,9 +7,8 @@ from torch.nn.modules.conv import _ConvNd
 from torch.nn.modules.utils import _ntuple, _triple
 
 from vedacore.misc import registry
-from vedacore.modules import (ConvModule, build_activation_layer,
-                              build_enhance_module, constant_init,
-                              kaiming_init)
+from vedacore.modules import (ConvModule, build_activation_layer, build_enhance_module, constant_init,
+                                kaiming_init)
 
 
 class BasicBlock3d(nn.Module):
@@ -41,21 +40,21 @@ class BasicBlock3d(nn.Module):
     expansion = 1
 
     def __init__(self,
-                 inplanes,
-                 planes,
-                 spatial_stride=1,
-                 temporal_stride=1,
-                 dilation=1,
-                 downsample=None,
-                 style='pytorch',
-                 inflate=True,
-                 enhance=False,
-                 enhance_cfg=dict(),
-                 conv_cfg=dict(typename='Conv3d'),
-                 norm_cfg=dict(typename='BN3d'),
-                 act_cfg=dict(typename='ReLU'),
-                 with_cp=False,
-                 **kwargs):
+                    inplanes,
+                    planes,
+                    spatial_stride=1,
+                    temporal_stride=1,
+                    dilation=1,
+                    downsample=None,
+                    style='pytorch',
+                    inflate=True,
+                    enhance=False,
+                    enhance_cfg=dict(),
+                    conv_cfg=dict(typename='Conv3d'),
+                    norm_cfg=dict(typename='BN3d'),
+                    act_cfg=dict(typename='ReLU'),
+                    with_cp=False,
+                    **kwargs):
         super().__init__()
         assert style in ['pytorch', 'caffe']
         # make sure that only ``inflate_style`` is passed into kwargs
@@ -91,36 +90,31 @@ class BasicBlock3d(nn.Module):
             conv2_kernel_size = (1, 3, 3)
             conv2_padding = (0, 1, 1)
 
-        self.conv1 = ConvModule(
-            inplanes,
-            planes,
-            conv1_kernel_size,
-            stride=(self.conv1_stride_t, self.conv1_stride_s,
-                    self.conv1_stride_s),
-            padding=conv1_padding,
-            dilation=(1, dilation, dilation),
-            conv_cfg=self.conv_cfg,
-            norm_cfg=self.norm_cfg,
-            act_cfg=self.act_cfg)
+        self.conv1 = ConvModule(inplanes,
+                                planes,
+                                conv1_kernel_size,
+                                stride=(self.conv1_stride_t, self.conv1_stride_s, self.conv1_stride_s),
+                                padding=conv1_padding,
+                                dilation=(1, dilation, dilation),
+                                conv_cfg=self.conv_cfg,
+                                norm_cfg=self.norm_cfg,
+                                act_cfg=self.act_cfg)
 
-        self.conv2 = ConvModule(
-            planes,
-            planes * self.expansion,
-            conv2_kernel_size,
-            stride=(self.conv2_stride_t, self.conv2_stride_s,
-                    self.conv2_stride_s),
-            padding=conv2_padding,
-            conv_cfg=self.conv_cfg,
-            norm_cfg=self.norm_cfg,
-            act_cfg=None)
+        self.conv2 = ConvModule(planes,
+                                planes * self.expansion,
+                                conv2_kernel_size,
+                                stride=(self.conv2_stride_t, self.conv2_stride_s, self.conv2_stride_s),
+                                padding=conv2_padding,
+                                conv_cfg=self.conv_cfg,
+                                norm_cfg=self.norm_cfg,
+                                act_cfg=None)
 
         self.downsample = downsample
         self.relu = build_activation_layer(self.act_cfg)
 
         if self.enhance:
             self.enhance_module = build_enhance_module(
-                self.enhance_cfg,
-                default_args=dict(in_channels=self.conv2.norm.num_features))
+                self.enhance_cfg, default_args=dict(in_channels=self.conv2.norm.num_features))
 
     def forward(self, x):
         """Defines the computation performed at every call."""
@@ -182,21 +176,21 @@ class Bottleneck3d(nn.Module):
     expansion = 4
 
     def __init__(self,
-                 inplanes,
-                 planes,
-                 spatial_stride=1,
-                 temporal_stride=1,
-                 dilation=1,
-                 downsample=None,
-                 style='pytorch',
-                 inflate=True,
-                 inflate_style='3x1x1',
-                 enhance=False,
-                 enhance_cfg=dict(),
-                 conv_cfg=dict(type='Conv3d'),
-                 norm_cfg=dict(type='BN3d'),
-                 act_cfg=dict(type='ReLU'),
-                 with_cp=False):
+                    inplanes,
+                    planes,
+                    spatial_stride=1,
+                    temporal_stride=1,
+                    dilation=1,
+                    downsample=None,
+                    style='pytorch',
+                    inflate=True,
+                    inflate_style='3x1x1',
+                    enhance=False,
+                    enhance_cfg=dict(),
+                    conv_cfg=dict(type='Conv3d'),
+                    norm_cfg=dict(type='BN3d'),
+                    act_cfg=dict(type='ReLU'),
+                    with_cp=False):
         super().__init__()
         assert style in ['pytorch', 'caffe']
         assert inflate_style in ['3x1x1', '3x3x3']
@@ -244,28 +238,24 @@ class Bottleneck3d(nn.Module):
             conv2_kernel_size = (1, 3, 3)
             conv2_padding = (0, dilation, dilation)
 
-        self.conv1 = ConvModule(
-            inplanes,
-            planes,
-            conv1_kernel_size,
-            stride=(self.conv1_stride_t, self.conv1_stride_s,
-                    self.conv1_stride_s),
-            padding=conv1_padding,
-            conv_cfg=self.conv_cfg,
-            norm_cfg=self.norm_cfg,
-            act_cfg=self.act_cfg)
+        self.conv1 = ConvModule(inplanes,
+                                planes,
+                                conv1_kernel_size,
+                                stride=(self.conv1_stride_t, self.conv1_stride_s, self.conv1_stride_s),
+                                padding=conv1_padding,
+                                conv_cfg=self.conv_cfg,
+                                norm_cfg=self.norm_cfg,
+                                act_cfg=self.act_cfg)
 
-        self.conv2 = ConvModule(
-            planes,
-            planes,
-            conv2_kernel_size,
-            stride=(self.conv2_stride_t, self.conv2_stride_s,
-                    self.conv2_stride_s),
-            padding=conv2_padding,
-            dilation=(1, dilation, dilation),
-            conv_cfg=self.conv_cfg,
-            norm_cfg=self.norm_cfg,
-            act_cfg=self.act_cfg)
+        self.conv2 = ConvModule(planes,
+                                planes,
+                                conv2_kernel_size,
+                                stride=(self.conv2_stride_t, self.conv2_stride_s, self.conv2_stride_s),
+                                padding=conv2_padding,
+                                dilation=(1, dilation, dilation),
+                                conv_cfg=self.conv_cfg,
+                                norm_cfg=self.norm_cfg,
+                                act_cfg=self.act_cfg)
 
         self.conv3 = ConvModule(
             planes,
@@ -273,7 +263,7 @@ class Bottleneck3d(nn.Module):
             1,
             conv_cfg=self.conv_cfg,
             norm_cfg=self.norm_cfg,
-            # No activation in the third ConvModule for bottleneck
+        # No activation in the third ConvModule for bottleneck
             act_cfg=None)
 
         self.downsample = downsample
@@ -281,8 +271,7 @@ class Bottleneck3d(nn.Module):
 
         if self.enhance:
             self.enhance_module = build_enhance_module(
-                self.enhance_cfg,
-                default_args=dict(in_channels=self.conv3.norm.num_features))
+                self.enhance_cfg, default_args=dict(in_channels=self.conv3.norm.num_features))
 
     def forward(self, x):
         """Defines the computation performed at every call."""
@@ -377,31 +366,31 @@ class ResNet3d(nn.Module):
     }
 
     def __init__(self,
-                 depth,
-                 in_channels=3,
-                 num_stages=4,
-                 base_channels=64,
-                 out_indices=(3, ),
-                 spatial_strides=(1, 2, 2, 2),
-                 temporal_strides=(1, 1, 1, 1),
-                 dilations=(1, 1, 1, 1),
-                 conv1_kernel=(5, 7, 7),
-                 conv1_stride_t=2,
-                 pool1_stride_t=2,
-                 with_pool2=True,
-                 style='pytorch',
-                 frozen_stages=-1,
-                 inflate=(1, 1, 1, 1),
-                 inflate_style='3x1x1',
-                 conv_cfg=dict(typename='Conv3d'),
-                 norm_cfg=dict(typename='BN3d'),
-                 act_cfg=dict(typename='ReLU'),
-                 norm_eval=False,
-                 with_cp=False,
-                 enhance=(0, 0, 0, 0),
-                 enhance_cfg=dict(),
-                 zero_init_residual=True,
-                 **kwargs):
+                    depth,
+                    in_channels=3,
+                    num_stages=4,
+                    base_channels=64,
+                    out_indices=(3,),
+                    spatial_strides=(1, 2, 2, 2),
+                    temporal_strides=(1, 1, 1, 1),
+                    dilations=(1, 1, 1, 1),
+                    conv1_kernel=(5, 7, 7),
+                    conv1_stride_t=2,
+                    pool1_stride_t=2,
+                    with_pool2=True,
+                    style='pytorch',
+                    frozen_stages=-1,
+                    inflate=(1, 1, 1, 1),
+                    inflate_style='3x1x1',
+                    conv_cfg=dict(typename='Conv3d'),
+                    norm_cfg=dict(typename='BN3d'),
+                    act_cfg=dict(typename='ReLU'),
+                    norm_eval=False,
+                    with_cp=False,
+                    enhance=(0, 0, 0, 0),
+                    enhance_cfg=dict(),
+                    zero_init_residual=True,
+                    **kwargs):
         super().__init__()
         if depth not in self.arch_settings:
             raise KeyError(f'invalid depth {depth} for resnet')
@@ -415,8 +404,7 @@ class ResNet3d(nn.Module):
         self.spatial_strides = spatial_strides
         self.temporal_strides = temporal_strides
         self.dilations = dilations
-        assert len(spatial_strides) == len(temporal_strides) == len(
-            dilations) == num_stages
+        assert len(spatial_strides) == len(temporal_strides) == len(dilations) == num_stages
         self.conv1_kernel = conv1_kernel
         self.conv1_stride_t = conv1_stride_t
         self.pool1_stride_t = pool1_stride_t
@@ -447,50 +435,48 @@ class ResNet3d(nn.Module):
             temporal_stride = temporal_strides[i]
             dilation = dilations[i]
             planes = self.base_channels * 2**i
-            res_layer = self.make_res_layer(
-                self.block,
-                self.inplanes,
-                planes,
-                num_blocks,
-                spatial_stride=spatial_stride,
-                temporal_stride=temporal_stride,
-                dilation=dilation,
-                style=self.style,
-                norm_cfg=self.norm_cfg,
-                conv_cfg=self.conv_cfg,
-                act_cfg=self.act_cfg,
-                enhance=self.enhance_stages[i],
-                enhance_cfg=self.enhance_cfg,
-                inflate=self.stage_inflations[i],
-                inflate_style=self.inflate_style,
-                with_cp=with_cp,
-                **kwargs)
+            res_layer = self.make_res_layer(self.block,
+                                            self.inplanes,
+                                            planes,
+                                            num_blocks,
+                                            spatial_stride=spatial_stride,
+                                            temporal_stride=temporal_stride,
+                                            dilation=dilation,
+                                            style=self.style,
+                                            norm_cfg=self.norm_cfg,
+                                            conv_cfg=self.conv_cfg,
+                                            act_cfg=self.act_cfg,
+                                            enhance=self.enhance_stages[i],
+                                            enhance_cfg=self.enhance_cfg,
+                                            inflate=self.stage_inflations[i],
+                                            inflate_style=self.inflate_style,
+                                            with_cp=with_cp,
+                                            **kwargs)
             self.inplanes = planes * self.block.expansion
             layer_name = f'layer{i + 1}'
             self.add_module(layer_name, res_layer)
             self.res_layers.append(layer_name)
 
-        self.feat_dim = self.block.expansion * self.base_channels * 2**(
-            len(self.stage_blocks) - 1)
+        self.feat_dim = self.block.expansion * self.base_channels * 2**(len(self.stage_blocks) - 1)
 
     @staticmethod
     def make_res_layer(block,
-                       inplanes,
-                       planes,
-                       blocks,
-                       spatial_stride=1,
-                       temporal_stride=1,
-                       dilation=1,
-                       style='pytorch',
-                       inflate=1,
-                       inflate_style='3x1x1',
-                       enhance=0,
-                       enhance_cfg=dict(),
-                       norm_cfg=None,
-                       act_cfg=None,
-                       conv_cfg=None,
-                       with_cp=False,
-                       **kwargs):
+                        inplanes,
+                        planes,
+                        blocks,
+                        spatial_stride=1,
+                        temporal_stride=1,
+                        dilation=1,
+                        style='pytorch',
+                        inflate=1,
+                        inflate_style='3x1x1',
+                        enhance=0,
+                        enhance_cfg=dict(),
+                        norm_cfg=None,
+                        act_cfg=None,
+                        conv_cfg=None,
+                        with_cp=False,
+                        **kwargs):
         """Build residual layer for ResNet3D.
 
         Args:
@@ -528,80 +514,73 @@ class ResNet3d(nn.Module):
         Returns:
             nn.Module: A residual layer for the given config.
         """
-        inflate = inflate if not isinstance(inflate,
-                                            int) else (inflate, ) * blocks
-        enhance = enhance if not isinstance(enhance,
-                                            int) else (enhance, ) * blocks
+        inflate = inflate if not isinstance(inflate, int) else (inflate,) * blocks
+        enhance = enhance if not isinstance(enhance, int) else (enhance,) * blocks
         assert len(inflate) == blocks and len(enhance) == blocks
         downsample = None
         if spatial_stride != 1 or inplanes != planes * block.expansion:
-            downsample = ConvModule(
-                inplanes,
-                planes * block.expansion,
-                kernel_size=1,
-                stride=(temporal_stride, spatial_stride, spatial_stride),
-                conv_cfg=conv_cfg,
-                norm_cfg=norm_cfg,
-                act_cfg=None)
+            downsample = ConvModule(inplanes,
+                                    planes * block.expansion,
+                                    kernel_size=1,
+                                    stride=(temporal_stride, spatial_stride, spatial_stride),
+                                    conv_cfg=conv_cfg,
+                                    norm_cfg=norm_cfg,
+                                    act_cfg=None)
 
         layers = []
         layers.append(
-            block(
-                inplanes,
-                planes,
-                spatial_stride=spatial_stride,
-                temporal_stride=temporal_stride,
-                dilation=dilation,
-                downsample=downsample,
-                style=style,
-                inflate=(inflate[0] == 1),
-                inflate_style=inflate_style,
-                enhance=(enhance[0] == 1),
-                enhance_cfg=enhance_cfg,
-                norm_cfg=norm_cfg,
-                conv_cfg=conv_cfg,
-                act_cfg=act_cfg,
-                with_cp=with_cp,
-                **kwargs))
-        inplanes = planes * block.expansion
-        for i in range(1, blocks):
-            layers.append(
-                block(
-                    inplanes,
+            block(inplanes,
                     planes,
-                    spatial_stride=1,
-                    temporal_stride=1,
+                    spatial_stride=spatial_stride,
+                    temporal_stride=temporal_stride,
                     dilation=dilation,
+                    downsample=downsample,
                     style=style,
-                    inflate=(inflate[i] == 1),
+                    inflate=(inflate[0] == 1),
                     inflate_style=inflate_style,
-                    enhance=(enhance[i] == 1),
+                    enhance=(enhance[0] == 1),
                     enhance_cfg=enhance_cfg,
                     norm_cfg=norm_cfg,
                     conv_cfg=conv_cfg,
                     act_cfg=act_cfg,
                     with_cp=with_cp,
                     **kwargs))
+        inplanes = planes * block.expansion
+        for i in range(1, blocks):
+            layers.append(
+                block(inplanes,
+                        planes,
+                        spatial_stride=1,
+                        temporal_stride=1,
+                        dilation=dilation,
+                        style=style,
+                        inflate=(inflate[i] == 1),
+                        inflate_style=inflate_style,
+                        enhance=(enhance[i] == 1),
+                        enhance_cfg=enhance_cfg,
+                        norm_cfg=norm_cfg,
+                        conv_cfg=conv_cfg,
+                        act_cfg=act_cfg,
+                        with_cp=with_cp,
+                        **kwargs))
 
         return nn.Sequential(*layers)
 
     def _make_stem_layer(self):
         """Construct the stem layers consists of a conv+norm+act module and a
         pooling layer."""
-        self.conv1 = ConvModule(
-            self.in_channels,
-            self.base_channels,
-            kernel_size=self.conv1_kernel,
-            stride=(self.conv1_stride_t, 2, 2),
-            padding=tuple([(k - 1) // 2 for k in _triple(self.conv1_kernel)]),
-            conv_cfg=self.conv_cfg,
-            norm_cfg=self.norm_cfg,
-            act_cfg=self.act_cfg)
+        self.conv1 = ConvModule(self.in_channels,
+                                self.base_channels,
+                                kernel_size=self.conv1_kernel,
+                                stride=(self.conv1_stride_t, 2, 2),
+                                padding=tuple([(k - 1) // 2 for k in _triple(self.conv1_kernel)]),
+                                conv_cfg=self.conv_cfg,
+                                norm_cfg=self.norm_cfg,
+                                act_cfg=self.act_cfg)
 
-        self.maxpool = nn.MaxPool3d(
-            kernel_size=(1, 3, 3),
-            stride=(self.pool1_stride_t, 2, 2),
-            padding=(0, 1, 1))
+        self.maxpool = nn.MaxPool3d(kernel_size=(1, 3, 3),
+                                    stride=(self.pool1_stride_t, 2, 2),
+                                    padding=(0, 1, 1))
 
         self.pool2 = nn.MaxPool3d(kernel_size=(2, 1, 1), stride=(2, 1, 1))
 

@@ -1,0 +1,79 @@
+#!/bin/bash
+#================================================================
+#   Don't go gently into that good night. 
+#   
+#   author: klaus
+#   description: 
+#
+#================================================================
+set -ex
+
+## 1.a.iii
+#workdir=workdir/1.a.iii
+#tools/dist_trainval.sh configs/trainval/daotad/daotad_vswin_t_e700_thumos14_rgb.py "0,1,2,3" --workdir $workdir
+#epoch=700
+#python tools/test.py configs/trainval/daotad/daotad_vswin_t_e700_thumos14_rgb.py $workdir/epoch_${epoch}_weights.pth \
+#    --out $workdir/results_e$epoch.pkl
+
+## 1.b.ii
+#workdir=workdir/1.b.ii
+#tools/dist_trainval.sh configs/trainval/daotad/daotad_vswin_t_e700_thumos14_rgb_224x224.py "0,1,2,3,4,5,6,7" --workdir $workdir
+###test
+#epoch=700
+#CUDA_VISIBLE_DEVICES=0 python tools/test.py configs/trainval/daotad/daotad_vswin_t_e700_thumos14_rgb_224x224.py $workdir/epoch_${epoch}_weights.pth \
+#    --out $workdir/results_e$epoch.pkl
+
+## 1.c.ii
+#workdir=workdir/1.c.ii
+#epoch=700
+#config=configs/trainval/daotad/1.c.ii.py
+#tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+#python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+#    --out $workdir/results_e$epoch.pkl
+
+## 1.c.iii
+#workdir=workdir/1.c.iii
+#epoch=700
+#config=configs/trainval/daotad/1.c.iii.py
+#tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+#python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+#    --out $workdir/results_e$epoch.pkl
+
+## 1.d.iii
+#workdir=workdir/1.d.iii
+#epoch=700
+#config=configs/trainval/daotad/1.d.iii.py
+#tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+#python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+#    --out $workdir/results_e$epoch.pkl
+
+## 1.d.ii
+#workdir=workdir/1.d.ii
+#epoch=700
+#config=configs/trainval/daotad/1.d.ii.py
+#tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+#python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+#    --out $workdir/results_e$epoch.pkl
+
+## 1.e.i
+#workdir=workdir/1.e.i
+#epoch=700
+#config=configs/trainval/daotad/1.e.i.py
+#tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+#python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+#    --out $workdir/results_e$epoch.pkl
+
+## 1.e.iii
+#workdir=workdir/1.e.iii
+#epoch=700
+#config=configs/trainval/daotad/1.e.iii.py
+#tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+#python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+#    --out $workdir/results_e$epoch.pkl
+
+# 2.a.ii
+workdir=workdir/2.a.ii
+tools/dist_trainval.sh configs/trainval/daotad/2.a.ii.py "0,1,2,3" --workdir $workdir
+epoch=700
+python tools/test.py configs/trainval/daotad/daotad_vswin_t_e700_thumos14_rgb.py $workdir/epoch_${epoch}_weights.pth \
+    --out $workdir/results_e$epoch.pkl

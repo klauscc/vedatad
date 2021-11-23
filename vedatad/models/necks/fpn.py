@@ -64,19 +64,19 @@ class FPN(nn.Module):
     """
 
     def __init__(self,
-                 in_channels,
-                 out_channels,
-                 num_outs,
-                 start_level=0,
-                 end_level=-1,
-                 add_extra_convs=False,
-                 extra_convs_on_inputs=True,
-                 relu_before_extra_convs=False,
-                 no_norm_on_lateral=False,
-                 conv_cfg=None,
-                 norm_cfg=None,
-                 act_cfg=None,
-                 upsample_cfg=dict(mode='nearest')):
+                    in_channels,
+                    out_channels,
+                    num_outs,
+                    start_level=0,
+                    end_level=-1,
+                    add_extra_convs=False,
+                    extra_convs_on_inputs=True,
+                    relu_before_extra_convs=False,
+                    no_norm_on_lateral=False,
+                    conv_cfg=None,
+                    norm_cfg=None,
+                    act_cfg=None,
+                    upsample_cfg=dict(mode='nearest')):
         super(FPN, self).__init__()
         assert isinstance(in_channels, list)
         self.in_channels = in_channels
@@ -103,7 +103,7 @@ class FPN(nn.Module):
         if isinstance(add_extra_convs, str):
             # Extra_convs_source choices: 'on_input', 'on_lateral', 'on_output'
             assert add_extra_convs in ('on_input', 'on_lateral', 'on_output')
-        elif add_extra_convs:  # True
+        elif add_extra_convs:    # True
             if extra_convs_on_inputs:
                 # For compatibility with previous release
                 # TODO: deprecate `extra_convs_on_inputs`
@@ -115,23 +115,21 @@ class FPN(nn.Module):
         self.fpn_convs = nn.ModuleList()
 
         for i in range(self.start_level, self.backbone_end_level):
-            l_conv = ConvModule(
-                in_channels[i],
-                out_channels,
-                1,
-                conv_cfg=conv_cfg,
-                norm_cfg=norm_cfg if not self.no_norm_on_lateral else None,
-                act_cfg=act_cfg,
-                inplace=False)
-            fpn_conv = ConvModule(
-                out_channels,
-                out_channels,
-                3,
-                padding=1,
-                conv_cfg=conv_cfg,
-                norm_cfg=norm_cfg,
-                act_cfg=act_cfg,
-                inplace=False)
+            l_conv = ConvModule(in_channels[i],
+                                out_channels,
+                                1,
+                                conv_cfg=conv_cfg,
+                                norm_cfg=norm_cfg if not self.no_norm_on_lateral else None,
+                                act_cfg=act_cfg,
+                                inplace=False)
+            fpn_conv = ConvModule(out_channels,
+                                    out_channels,
+                                    3,
+                                    padding=1,
+                                    conv_cfg=conv_cfg,
+                                    norm_cfg=norm_cfg,
+                                    act_cfg=act_cfg,
+                                    inplace=False)
 
             self.lateral_convs.append(l_conv)
             self.fpn_convs.append(fpn_conv)
@@ -144,16 +142,15 @@ class FPN(nn.Module):
                     in_channels = self.in_channels[self.backbone_end_level - 1]
                 else:
                     in_channels = out_channels
-                extra_fpn_conv = ConvModule(
-                    in_channels,
-                    out_channels,
-                    3,
-                    stride=2,
-                    padding=1,
-                    conv_cfg=conv_cfg,
-                    norm_cfg=norm_cfg,
-                    act_cfg=act_cfg,
-                    inplace=False)
+                extra_fpn_conv = ConvModule(in_channels,
+                                            out_channels,
+                                            3,
+                                            stride=2,
+                                            padding=1,
+                                            conv_cfg=conv_cfg,
+                                            norm_cfg=norm_cfg,
+                                            act_cfg=act_cfg,
+                                            inplace=False)
                 self.fpn_convs.append(extra_fpn_conv)
 
     # default init_weights for conv(msra) and norm in ConvModule
@@ -169,8 +166,7 @@ class FPN(nn.Module):
 
         # build laterals
         laterals = [
-            lateral_conv(inputs[i + self.start_level])
-            for i, lateral_conv in enumerate(self.lateral_convs)
+            lateral_conv(inputs[i + self.start_level]) for i, lateral_conv in enumerate(self.lateral_convs)
         ]
 
         # build top-down path
@@ -179,21 +175,17 @@ class FPN(nn.Module):
             # In some cases, fixing `scale factor` (e.g. 2) is preferred, but
             #  it cannot co-exist with `size` in `F.interpolate`.
             if 'scale_factor' in self.upsample_cfg:
-                laterals[i - 1] += F.interpolate(laterals[i],
-                                                 **self.upsample_cfg)
+                laterals[i - 1] += F.interpolate(laterals[i], **self.upsample_cfg)
             else:
                 prev_shape = laterals[i - 1].shape[2:]
                 # This is a workaround when converting PyTorch model
                 # to ONNX model
                 prev_shape = tuple(map(lambda x: int(x), prev_shape))
-                laterals[i - 1] += F.interpolate(
-                    laterals[i], size=prev_shape, **self.upsample_cfg)
+                laterals[i - 1] += F.interpolate(laterals[i], size=prev_shape, **self.upsample_cfg)
 
         # build outputs
         # part 1: from original levels
-        outs = [
-            self.fpn_convs[i](laterals[i]) for i in range(used_backbone_levels)
-        ]
+        outs = [self.fpn_convs[i](laterals[i]) for i in range(used_backbone_levels)]
         # part 2: add extra levels
         if self.num_outs > len(outs):
             # use max pool to get more levels on top of outputs
