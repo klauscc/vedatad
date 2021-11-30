@@ -5,6 +5,8 @@ from collections import OrderedDict
 from vedacore.misc import registry
 from .base_hook import BaseHook
 
+import torch
+
 
 @registry.register_module('hook')
 class LoggerHook(BaseHook):
@@ -38,6 +40,8 @@ class LoggerHook(BaseHook):
                 val = f'{val:.4f}'
             log_items.append(f'{name}: {val}')
         log_str += ', '.join(log_items)
+
+        log_str += f'. max GPU mem: {torch.cuda.max_memory_allocated() /1024/1024}MB'
 
         looper.logger.info(log_str)
 
