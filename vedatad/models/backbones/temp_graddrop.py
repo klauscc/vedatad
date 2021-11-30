@@ -191,7 +191,7 @@ class GradDropChunkVideoSwinV2(SwinTransformer3D):
         Args:
             x (torch.Tensor): input video. shape: (num_chunks,B,C,chunk_size,H,W)
 
-        Returns: TODO
+        Returns: the extracted features. shape: (num_chunks, B, C1, D1, H1, W1)
 
         """
         num_chunks, B, C, chunk_size, H, W = x.shape
@@ -209,7 +209,7 @@ class GradDropChunkVideoSwinV2(SwinTransformer3D):
         Args:
             x (torch.Tensor): input video. shape: (B,C,D,H,W)
 
-        Returns: TODO
+        Returns: The extracted features. shape: (B, C1, D1, H1, W1)
 
         """
         B, C, D, H, W = x.shape
@@ -226,9 +226,9 @@ class GradDropChunkVideoSwinV2(SwinTransformer3D):
         keep_indices, drop_indices = generate_indices(num_chunks, self.keep_ratio)
 
         with torch.no_grad():
-            y_wo_grad = self.forward_fn(x[drop_indices])
+            y_wo_grad = self.forward_fn(x[drop_indices].contiguous())
 
-        y_w_grad = self.forward_fn(x[keep_indices])
+        y_w_grad = self.forward_fn(x[keep_indices].contiguous())
 
         _, B, C1, D1, H1, W1 = y_w_grad.shape
         y = torch.zeros(num_chunks, B, C1, D1, H1, W1, device=x.device, dtype=x.dtype)
