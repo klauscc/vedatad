@@ -174,3 +174,66 @@ class GradDropChunkVideoSwin(SwinTransformer3D):
         num_chunks, B, C1, D1, H1, W1 = y.shape
         y = y.permute(1, 2, 0, 3, 4, 5).reshape(B, C1, num_chunks * D1, H1, W1)
         return y
+
+
+@registry.register_module("backbone")
+class GradDropChunkVideoSwinV2(SwinTransformer3D):
+    """chunk-wise video swin with partial feedback."""
+
+    def __init__(self, keep_ratio, chunk_size, *args, **kwargs):
+        super(GradDropChunkVideoSwinV2, self).__init__(*args, **kwargs)
+        self.chunk_size = chunk_size
+        self.keep_ratio = keep_ratio
+
+    def forward_fn(self, x):
+        """forward function
+
+        Args:
+            x (torch.Tensor): input video. shape: (num_chunks,B,C,chunk_size,H,W)
+
+        Returns: TODO
+
+        """
+        num_chunks, B, C, chunk_size, H, W = x.shape
+        x = x.reshape(
+            num_chunks * B, C, chunk_size, H, W
+        )  # shape: [num_chunks*B, C,D,H,W]
+        y = super().forward(x)  # shape: [num_chunks*B, C', D', H', W']
+        _, C1, D1, H1, W1 = y.shape
+        y = y.reshape(num_chunks, B, C1, D1, H1, W1)
+        return y
+
+    def forward(self, x):
+        """forward
+
+        Args:
+            x (torch.Tensor): input video. shape: (B,C,D,H,W)
+
+        Returns: TODO
+
+        """
+        B, C, D, H, W = x.shape
+        chunk_size = self.chunk_size
+        assert D % chunk_size == 0, "D mod chunk_size must be 0."
+        num_chunks = D // chunk_size
+
+        # transpose input
+        x = x.reshape(B, C, num_chunks, chunk_size, H, W).permute(
+            2, 0, 1, 3, 4, 5
+        )  # shape: (num_chunks, B, C, chunk_size, H, W)
+
+        # generate indices
+        keep_indices, drop_indices = generate_indices(num_chunks, self.keep_ratio)
+
+        with torch.no_grad():
+            y_wo_grad = self.forward_fn(x[drop_indices])
+
+        y_w_grad = self.forward_fn(x[keep_indices])
+
+        _, B, C1, D1, H1, W1 = y_w_grad.shape
+        y = torch.zeros(num_chunks, B, C1, D1, H1, W1, device=x.device, dtype=x.dtype)
+        y[keep_indices] = y_w_grad
+        y[drop_indices] = y_wo_grad
+
+        y = y.permute(1, 2, 0, 3, 4, 5).reshape(B, C1, num_chunks * D1, H1, W1)
+        return y
