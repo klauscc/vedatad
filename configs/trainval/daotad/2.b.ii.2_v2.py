@@ -5,9 +5,8 @@ img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True
 )
 num_frames = 480
-img_shape = (224, 224)
+img_shape = (112, 112)
 overlap_ratio = 0.25
-img_dir = "frames_15fps_256x256"
 
 data = dict(
     samples_per_gpu=4,
@@ -15,7 +14,7 @@ data = dict(
     train=dict(
         typename=dataset_type,
         ann_file=data_root + "annotations/val.json",
-        video_prefix=data_root + f"{img_dir}/val",
+        video_prefix=data_root + "frames_15fps/val",
         pipeline=[
             dict(typename="LoadMetaInfo"),
             dict(typename="LoadAnnotations"),
@@ -45,7 +44,7 @@ data = dict(
     val=dict(
         typename=dataset_type,
         ann_file=data_root + "annotations/test.json",
-        video_prefix=data_root + f"{img_dir}/test",
+        video_prefix=data_root + "frames_15fps/test",
         pipeline=[
             dict(typename="LoadMetaInfo"),
             dict(typename="Time2Frame"),
@@ -79,7 +78,7 @@ model = dict(
     typename="SingleStageDetector",
     backbone=dict(
         typename="GradDropChunkVideoSwinV2",
-        keep_ratio=0.4,
+        keep_ratio=0.2,
         chunk_size=32,
         patch_size=(2, 4, 4),
         in_chans=3,

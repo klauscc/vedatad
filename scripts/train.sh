@@ -129,24 +129,16 @@ COMMENT
 
 <<COMMENT
 # 2.b.ii.2
-workdir=workdir/2.b.ii.2
-config=configs/trainval/daotad/2.b.ii.2.py
+workdir=workdir/2.b.ii.2_v2 
+config=configs/trainval/daotad/2.b.ii.2_v2.py
 tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
 # Testing chunk
-workdir=workdir/2.b.ii.2
-config=configs/trainval/daotad/2.b.ii.2.py
+workdir=workdir/2.b.ii.2_v2 
+config=configs/trainval/daotad/2.b.ii.2_v2.py
 for epoch in 700 800 900 1000 1100 1200; do
     echo Epoch: $epoch. Inferencing...
     python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
         --out $workdir/results_e$epoch-chunk.pkl
-done
-# Testing whole
-workdir=workdir/2.b.ii.2
-config=configs/trainval/daotad/1.a.iii.py
-for epoch in 700 800 900 1000 1100 1200; do
-    echo Epoch: $epoch. Inferencing...
-    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
-        --out $workdir/results_e$epoch-whole.pkl
 done
 COMMENT
 
@@ -158,22 +150,56 @@ tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
 # Testing chunk
 workdir=workdir/2.b.ii_v2
 config=configs/trainval/daotad/2.b.ii_v2.py
-epoch=700
+epoch=900
 python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
     --out $workdir/results_e$epoch-chunk.pkl
 #COMMENT
 
 <<COMMENT
-# 2.b.ii.3_v2
-workdir=workdir/2.b.ii.3_v2
-config=configs/trainval/daotad/2.b.ii.3_v2.py
-tools/dist_trainval.sh $config "4,5,6,7" --workdir $workdir
+# 2.b.ii.3
+workdir=workdir/2.b.ii.3
+config=configs/trainval/daotad/2.b.ii.3.py
+tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
 # Testing chunk
-workdir=workdir/2.b.ii.3_v2
-config=configs/trainval/daotad/2.b.ii.3_v2.py
-epoch=900
-python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
-    --out $workdir/results_e$epoch-chunk.pkl
+workdir=workdir/2.b.ii.3
+config=configs/trainval/daotad/2.b.ii.3.py
+#epoch=900
+for epoch in 700 800 900 1000 1100 1200; do
+    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+        --out $workdir/results_e$epoch-chunk.pkl
+done
+COMMENT
+
+<<COMMENT
+# 2.b.ii.4
+expid=2.b.ii.4
+workdir=workdir/${expid}
+config=configs/trainval/daotad/$expid.py
+tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+# Testing chunk
+workdir=workdir/$expid
+config=configs/trainval/daotad/$expid.py
+#epoch=900
+for epoch in 700 800 900 1000 1100 1200; do
+    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+        --out $workdir/results_e$epoch-chunk.pkl
+done
+COMMENT
+
+<<COMMENT
+# 2.b.ii.5
+expid=2.b.ii.5
+workdir=workdir/${expid}
+config=configs/trainval/daotad/$expid.py
+tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+# Testing chunk
+workdir=workdir/$expid
+config=configs/trainval/daotad/$expid.py
+#epoch=900
+for epoch in 100 200 300 400 500 600 700 800 900 1000 1100 1200; do
+    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+        --out $workdir/results_e$epoch-chunk.pkl
+done
 COMMENT
 
 <<COMMENT
@@ -197,7 +223,7 @@ tools/dist_trainval.sh $config "4,5,6,7" --workdir $workdir
 # Testing chunk
 workdir=workdir/2.b.iv
 config=configs/trainval/daotad/2.b.iv.py
-epoch=300
+epoch=700
 python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
     --out $workdir/results_e$epoch-chunk.pkl
 COMMENT
