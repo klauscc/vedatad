@@ -85,7 +85,7 @@ COMMENT
 # 2.a.ii
 workdir=workdir/2.a.ii
 config=configs/trainval/daotad/2.a.ii.py
-tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+tools/dist_trainval.sh $config "4,5,6,7" --workdir $workdir
 # Tesing chunk
 workdir=workdir/2.a.ii
 config=configs/trainval/daotad/2.a.ii.py
@@ -106,11 +106,11 @@ COMMENT
 
 <<COMMENT
 # 2.b.ii
-workdir=workdir/2.b.ii
+workdir=workdir/2.b.ii_run2 
 config=configs/trainval/daotad/2.b.ii.py
 tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
 # Testing chunk
-workdir=workdir/2.b.ii
+workdir=workdir/2.b.ii_run2 
 config=configs/trainval/daotad/2.b.ii.py
 for epoch in 700 800 900 1000 1100 1200; do
     echo Epoch: $epoch. Inferencing...
@@ -159,7 +159,7 @@ python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
 # 2.b.ii.3
 workdir=workdir/2.b.ii.3
 config=configs/trainval/daotad/2.b.ii.3.py
-tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+tools/dist_trainval.sh $config "4,5,6,7" --workdir $workdir
 # Testing chunk
 workdir=workdir/2.b.ii.3
 config=configs/trainval/daotad/2.b.ii.3.py
@@ -226,4 +226,34 @@ config=configs/trainval/daotad/2.b.iv.py
 epoch=700
 python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
     --out $workdir/results_e$epoch-chunk.pkl
+COMMENT
+
+<<COMMENT
+# 2.b.vi
+workdir=workdir/2.b.vi
+config=configs/trainval/daotad/2.b.vi.py
+tools/dist_trainval.sh $config "4,5,6,7" --workdir $workdir
+# Testing chunk
+workdir=workdir/2.b.vi
+config=configs/trainval/daotad/2.b.vi.py
+epoch=500
+#for epoch in 100 200 300 400 500 600 700 800 900 1000 1100 1200; do
+    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+        --out $workdir/results_e$epoch-chunk.pkl
+done
+COMMENT
+
+<<COMMENT
+# 2.b.vii
+workdir=workdir/2.b.vii
+config=configs/trainval/daotad/2.b.vii.py
+tools/dist_trainval.sh $config "4,5,6,7" --workdir $workdir
+# Testing chunk
+workdir=workdir/2.b.vii
+config=configs/trainval/daotad/2.b.vii.py
+epoch=400
+#for epoch in 100 200 300 400 500 600 700 800 900 1000 1100 1200; do
+    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+        --out $workdir/results_e$epoch-chunk.pkl
+done
 COMMENT
