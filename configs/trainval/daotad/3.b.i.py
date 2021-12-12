@@ -5,9 +5,12 @@ img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True
 )
 num_frames = 480
+chunk_size = 32
 img_shape = (224, 224)
 overlap_ratio = 0.25
-img_dir = "frames_15fps_256x256"
+keep_ratio = 0.2
+feat_downsample = 2
+expid = "3.b.i"
 
 data = dict(
     samples_per_gpu=4,
@@ -15,7 +18,7 @@ data = dict(
     train=dict(
         typename=dataset_type,
         ann_file=data_root + "annotations/val.json",
-        video_prefix=data_root + f"{img_dir}/val",
+        video_prefix=data_root + "frames_15fps/val",
         pipeline=[
             dict(typename="LoadMetaInfo"),
             dict(typename="LoadAnnotations"),
@@ -45,7 +48,7 @@ data = dict(
     val=dict(
         typename=dataset_type,
         ann_file=data_root + "annotations/test.json",
-        video_prefix=data_root + f"{img_dir}/test",
+        video_prefix=data_root + "frames_15fps/test",
         pipeline=[
             dict(typename="LoadMetaInfo"),
             dict(typename="Time2Frame"),
@@ -65,29 +68,33 @@ data = dict(
             ),
         ],
     ),
+)
+
 # 2. model
 num_classes = 20
+strides = [8, 16, 32, 64, 128]
+use_sigmoid = True
 scales_per_octave = 5
 octave_base_scale = 2
 num_anchors = scales_per_octave
 
 model = dict(
-    typename="SingleStageDetector",
+    typename="MemSingleStageDetector",
+    chunk_size=chunk_size,
     backbone=dict(
-        typename="GradDropChunkVideoSwinV2",
-        bp_idx_mode="random",
-        keep_ratio=0.2,
-        chunk_size=32,
-        frozen_stages=2,
-        use_checkpoint=True,
+        typename="ChunkVideoSwinWithChunkInput",
+        chunk_size=chunk_size,
+        do_pooling=True,
         patch_size=(2, 4, 4),
         in_chans=3,
+        window_size=(8, 7, 7),
         embed_dim=128,
         drop_path_rate=0.2,
         depths=[2, 2, 18, 2],
         num_heads=[4, 8, 16, 32],
-        window_size=(8, 7, 7),
         patch_norm=True,
+        frozen_stages=2,
+        use_checkpoint=True,
     ),
     neck=[
         dict(
@@ -147,7 +154,15 @@ segment_coder = dict(
 )
 
 train_engine = dict(
-    typename="TrainEngine",
+    typename="MemBankTrainEngine",
+    membank=dict(
+        chunk_size=chunk_size,
+        keep_ratio=keep_ratio,
+        feat_downsample=feat_downsample,
+        mode="random",
+        mem_bank_meta_file=f"data/tmp/thumos14/memory_mechanism/{expid}/feat_swinb_15fps_256x256_crop224x224/meta_val.json",
+        mem_bank_dir=f"data/tmp/thumos14/memory_mechanism/{expid}/feat_swinb_15fps_256x256_crop224x224/val",
+    ),
     model=model,
     criterion=dict(
         typename="SegmentAnchorCriterion",
@@ -178,13 +193,7 @@ train_engine = dict(
             debug=False,
         ),
     ),
-    optimizer=dict(
-        typename="SGD",
-        lr=0.01,
-        momentum=0.9,
-        weight_decay=0.0001,
-        paramwise_cfg=dict(custom_keys=dict(backbone={"lr_mult": 0.2})),
-    ),
+    optimizer=dict(typename="SGD", lr=0.01, momentum=0.9, weight_decay=0.0001),
 )
 
 # 3.2 val engine

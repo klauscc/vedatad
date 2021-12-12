@@ -29,10 +29,10 @@ def to_tensor(data):
     elif isinstance(data, float):
         return torch.FloatTensor([data])
     else:
-        raise TypeError(f'type {type(data)} cannot be converted to tensor.')
+        raise TypeError(f"type {type(data)} cannot be converted to tensor.")
 
 
-@registry.register_module('pipeline')
+@registry.register_module("pipeline")
 class ToTensor(object):
     """Convert some results to :obj:`torch.Tensor` by given keys.
 
@@ -58,10 +58,10 @@ class ToTensor(object):
         return results
 
     def __repr__(self):
-        return self.__class__.__name__ + f'(keys={self.keys})'
+        return self.__class__.__name__ + f"(keys={self.keys})"
 
 
-@registry.register_module('pipeline')
+@registry.register_module("pipeline")
 class ImageToTensor(object):
     """Convert image to :obj:`torch.Tensor` by given keys.
 
@@ -95,10 +95,10 @@ class ImageToTensor(object):
         return results
 
     def __repr__(self):
-        return self.__class__.__name__ + f'(keys={self.keys})'
+        return self.__class__.__name__ + f"(keys={self.keys})"
 
 
-@registry.register_module('pipeline')
+@registry.register_module("pipeline")
 class Transpose(object):
     """Transpose some results by given keys.
 
@@ -126,11 +126,10 @@ class Transpose(object):
         return results
 
     def __repr__(self):
-        return self.__class__.__name__ + \
-            f'(keys={self.keys}, order={self.order})'
+        return self.__class__.__name__ + f"(keys={self.keys}, order={self.order})"
 
 
-@registry.register_module('pipeline')
+@registry.register_module("pipeline")
 class ToDataContainer(object):
     """Convert results to :obj:`DataContainer` by given fields.
 
@@ -142,9 +141,14 @@ class ToDataContainer(object):
             dict(key='gt_labels'))``.
     """
 
-    def __init__(self,
-                 fields=(dict(key='img', stack=True), dict(key='gt_bboxes'),
-                         dict(key='gt_labels'))):
+    def __init__(
+        self,
+        fields=(
+            dict(key="img", stack=True),
+            dict(key="gt_bboxes"),
+            dict(key="gt_labels"),
+        ),
+    ):
         self.fields = fields
 
     def __call__(self, results):
@@ -161,15 +165,15 @@ class ToDataContainer(object):
 
         for field in self.fields:
             field = field.copy()
-            key = field.pop('key')
+            key = field.pop("key")
             results[key] = DC(results[key], **field)
         return results
 
     def __repr__(self):
-        return self.__class__.__name__ + f'(fields={self.fields})'
+        return self.__class__.__name__ + f"(fields={self.fields})"
 
 
-@registry.register_module('pipeline')
+@registry.register_module("pipeline")
 class DefaultFormatBundle(object):
     """Default formatting bundle.
 
@@ -195,20 +199,29 @@ class DefaultFormatBundle(object):
                 default bundle.
         """
 
-        if 'imgs' in results:
-            imgs = results['imgs']
+        if "imgs" in results:
+            imgs = results["imgs"]
             # add default meta keys
             results = self._add_default_meta_keys(results)
             if len(imgs.shape) < 4:
                 imgs = np.expand_dims(imgs, -1)
             imgs = np.ascontiguousarray(imgs.transpose(3, 0, 1, 2))
-            results['imgs'] = DC(to_tensor(imgs), stack=True, pad_dims=3)
-        for key in [
-                'proposals', 'gt_segments', 'gt_segments_ignore', 'gt_labels'
-        ]:
+            results["imgs"] = DC(to_tensor(imgs), stack=True, pad_dims=3)
+        for key in ["proposals", "gt_segments", "gt_segments_ignore", "gt_labels"]:
             if key not in results:
                 continue
             results[key] = DC(to_tensor(results[key]))
+
+        for key in ["keep_indices", "drop_indices"]:
+            if key not in results:
+                continue
+            results[key] = DC(results[key], cpu_only=True)
+
+        for key in ["frozen_features"]:
+            if key not in results:
+                continue
+            results[key] = DC(to_tensor(results[key]), stack=True)
+
         return results
 
     def _add_default_meta_keys(self, results):
@@ -224,23 +237,25 @@ class DefaultFormatBundle(object):
         Returns:
             results (dict): Updated result dict contains the data to convert.
         """
-        imgs = results['imgs']
+        imgs = results["imgs"]
         num_channels = 1 if len(imgs.shape) < 3 else imgs.shape[-1]
         results.setdefault(
-            'img_norm_cfg',
+            "img_norm_cfg",
             dict(
                 mean=np.zeros(num_channels, dtype=np.float32),
                 std=np.ones(num_channels, dtype=np.float32),
-                to_rgb=False))
-        results.setdefault('tscale_factor', 1.0)
-        results.setdefault('tshift', 0.0)
+                to_rgb=False,
+            ),
+        )
+        results.setdefault("tscale_factor", 1.0)
+        results.setdefault("tshift", 0.0)
         return results
 
     def __repr__(self):
         return self.__class__.__name__
 
 
-@registry.register_module('pipeline')
+@registry.register_module("pipeline")
 class Collect(object):
     """Collect data from the loader relevant to the specific task.
 
@@ -279,11 +294,20 @@ class Collect(object):
             'img_norm_cfg')``
     """
 
-    def __init__(self,
-                 keys,
-                 meta_keys=('video_name', 'ori_video_name', 'img_norm_cfg',
-                            'ori_tsize', 'tshift', 'tsize', 'pad_tsize',
-                            'tscale_factor')):
+    def __init__(
+        self,
+        keys,
+        meta_keys=(
+            "video_name",
+            "ori_video_name",
+            "img_norm_cfg",
+            "ori_tsize",
+            "tshift",
+            "tsize",
+            "pad_tsize",
+            "tscale_factor",
+        ),
+    ):
         self.keys = keys
         self.meta_keys = meta_keys
 
@@ -304,17 +328,18 @@ class Collect(object):
         img_meta = {}
         for key in self.meta_keys:
             img_meta[key] = results[key]
-        data['video_metas'] = DC(img_meta, cpu_only=True)
+        data["video_metas"] = DC(img_meta, cpu_only=True)
         for key in self.keys:
             data[key] = results[key]
         return data
 
     def __repr__(self):
-        return self.__class__.__name__ + \
-            f'(keys={self.keys}, meta_keys={self.meta_keys})'
+        return (
+            self.__class__.__name__ + f"(keys={self.keys}, meta_keys={self.meta_keys})"
+        )
 
 
-@registry.register_module('pipeline')
+@registry.register_module("pipeline")
 class WrapFieldsToLists(object):
     """Wrap fields of the data dictionary into lists for evaluation.
 
@@ -352,4 +377,4 @@ class WrapFieldsToLists(object):
         return results
 
     def __repr__(self):
-        return f'{self.__class__.__name__}()'
+        return f"{self.__class__.__name__}()"

@@ -20,9 +20,11 @@ from vedacore.misc import registry
 class ChunkVideoSwin(SwinTransformer3D):
     """extract feature chunk wise"""
 
-    def __init__(self, chunk_size, *args, **kwargs):
+    def __init__(self, chunk_size, *args, do_pooling=False, **kwargs):
         super(ChunkVideoSwin, self).__init__(*args, **kwargs)
         self.chunk_size = chunk_size
+
+        self.pool = torch.nn.AdaptiveAvgPool3d([None, 1, 1]) if do_pooling else None
 
     def forward(self, x):
         """
@@ -50,4 +52,40 @@ class ChunkVideoSwin(SwinTransformer3D):
             .reshape(B, c, num_chunks * d, h, w)  # shape: [B, c, D//2, h, w]
         )
         x = x[:, :, : num_chunks * d - pad_d // 2, :, :].contiguous()
+
+        if self.pool:
+            x = self.pool(x)
+            x = x.squeeze(-1).squeeze(-1)
         return x
+
+
+@registry.register_module("backbone")
+class ChunkVideoSwinWithChunkInput(SwinTransformer3D):
+    """extract feature chunk wise. Receive input with chunk first."""
+
+    def __init__(self, chunk_size, *args, do_pooling=False, **kwargs):
+        super(ChunkVideoSwinWithChunkInput, self).__init__(*args, **kwargs)
+        self.chunk_size = chunk_size
+
+        self.pool = torch.nn.AdaptiveAvgPool3d([None, 1, 1]) if do_pooling else None
+
+    def forward(self, x):
+        """
+        Args:
+            x (Tensor[num_chunks, B, C, chunk_size, H, W]): input.
+
+        Returns: torch.Tensor. The extract features.
+            If `do_pooling` is True, the returned shape is (num_chunks, B, C, feat_chunk_size),
+            else is (num_chunks, B, C, feat_chunk_size, H', W')
+
+        """
+        num_chunks, B, C, chunk_size, H, W = x.shape
+        x = x.reshape(num_chunks * B, C, chunk_size, H, W)
+        x = super().forward(x)  # shape: [n, c, d, h, w]
+        n, c, d, h, w = x.shape
+        return_shape = (num_chunks, B, c, d, h, w)
+        if self.pool:
+            x = self.pool(x)
+            x = x.squeeze(-1).squeeze(-1)
+            return_shape = (num_chunks, B, c, d)
+        return x.reshape(return_shape)

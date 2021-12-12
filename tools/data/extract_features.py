@@ -31,39 +31,51 @@ swin_t_config = dict(
     use_checkpoint=False,
 )
 
-swin_b_config = (
-    dict(
-        typename="ChunkVideoSwin",
-        chunk_size=32,
-        frozen_stages=2,
-        use_checkpoint=True,
-        patch_size=(2, 4, 4),
-        in_chans=3,
-        embed_dim=128,
-        drop_path_rate=0.2,
-        depths=[2, 2, 18, 2],
-        num_heads=[4, 8, 16, 32],
-        window_size=(8, 7, 7),
-        patch_norm=True,
-    ),
+swin_b_config = dict(
+    typename="ChunkVideoSwin",
+    chunk_size=32,
+    frozen_stages=2,
+    use_checkpoint=True,
+    patch_size=(2, 4, 4),
+    in_chans=3,
+    embed_dim=128,
+    drop_path_rate=0.2,
+    depths=[2, 2, 18, 2],
+    num_heads=[4, 8, 16, 32],
+    window_size=(8, 7, 7),
+    patch_norm=True,
 )
 
 ################CONFIGS##################
 split = "test"
-video_dir = f"data/thumos14/frames_15fps/{split}"
-dst_dir = f"data/thumos14/memory_mechanism/feat_15fps_128x128_crop112x112/{split}"
-meta_file = (
-    f"data/thumos14/memory_mechanism/feat_15fps_128x128_crop112x112/meta_{split}.json"
-)
-os.makedirs(dst_dir, exist_ok=True)
 
+### swin_tiny, 15fps, 128x128
+video_dir = f"data/thumos14/frames_15fps/{split}"
+dst_dir = f"data/thumos14/memory_mechanism/feat_swint_15fps_128x128_crop112x112/{split}"
+meta_file = f"data/thumos14/memory_mechanism/feat_swint_15fps_128x128_crop112x112/meta_{split}.json"
 model_config = swin_t_config
+IMG_SHAPE = (112, 112)
+FEAT_DIM = 768
+ckpt_path = "data/pretrained_models/vswin/swin_tiny_patch244_window877_kinetics400_1k_keysfrom_backbone.pth"
+### end config
+
+### swin_base, 15fps, 256x256
+video_dir = f"data/thumos14/frames_15fps_256x256/{split}"
+dst_dir = f"data/thumos14/memory_mechanism/feat_swinb_15fps_256x256_crop224x224/{split}"
+meta_file = f"data/thumos14/memory_mechanism/feat_swinb_15fps_256x256_crop224x224/meta_{split}.json"
+model_config = swin_b_config
+IMG_SHAPE = (224, 224)
+FEAT_DIM = 1024
+ckpt_path = "data/pretrained_models/vswin/swin_base_patch244_window877_kinetics400_22k_keysfrom_backbone.pth"
+### end config
+
+
+os.makedirs(dst_dir, exist_ok=True)
 device = torch.device("cuda:0")
 
 model = build_backbone(model_config).to(device)
 
 ## load pretrained weights on K400.
-ckpt_path = "data/pretrained_models/vswin/swin_tiny_patch244_window877_kinetics400_1k_keysfrom_backbone.pth"
 states = torch.load(ckpt_path)
 new_state = {}
 for k, v in states.items():
@@ -76,8 +88,6 @@ model.train()  # simulate training.
 
 BATCH_SIZE = 16
 CHUNK_SIZE = 32
-IMG_SHAPE = (112, 112)
-FEAT_DIM = 768
 IMG_MEAN = torch.tensor([123.675, 116.28, 103.53], device=device)
 IMG_STD = torch.tensor([58.395, 57.12, 57.375], device=device)
 ########################################
@@ -126,8 +136,8 @@ def extract_one_video(video_path, dst_path):
         frames = frames.unsqueeze(0)  # [1,C,T,H,W]
         with torch.no_grad():
             feat = model(frames)
-            feat = F.adaptive_avg_pool3d(feat, (None, 1, 1))
-            feat = feat.squeeze().permute(1, 0)  # [T, C]
+            feat = F.adaptive_avg_pool3d(feat, (None, 1, 1))  # [1,C,T,1,1]
+            feat = feat.squeeze(-1).squeeze(-1).squeeze(0).permute(1, 0)  # [T, C]
         features.append(feat.cpu().numpy())
 
     features = np.concatenate(features)
@@ -138,13 +148,14 @@ def extract_one_video(video_path, dst_path):
 
 
 video_paths = sorted(glob(os.path.join(video_dir, "*")))
-metas = []
+metas = {}
 for i, p in enumerate(video_paths):
     video_name = os.path.basename(p)
-    print(f"extract features for video: {video_name}")
     dst_path = os.path.join(dst_dir, video_name + ".mmap")
+    print(f"extract features for video: {video_name}")
     num_frames, feat_shape = extract_one_video(p, dst_path)
-    metas.append({video_name: {"num_frames": num_frames, "feat_shape": feat_shape}})
+    print(f"    num_frames:{num_frames}. feat_shape: {feat_shape}")
+    metas[video_name] = {"num_frames": num_frames, "feat_shape": feat_shape}
 
 with open(meta_file, "w") as f:
     json.dump(metas, f, indent=4)

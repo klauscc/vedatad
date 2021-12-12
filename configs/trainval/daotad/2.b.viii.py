@@ -65,8 +65,12 @@ data = dict(
             ),
         ],
     ),
+)
+
 # 2. model
 num_classes = 20
+strides = [8, 16, 32, 64, 128]
+use_sigmoid = True
 scales_per_octave = 5
 octave_base_scale = 2
 num_anchors = scales_per_octave
@@ -183,7 +187,6 @@ train_engine = dict(
         lr=0.01,
         momentum=0.9,
         weight_decay=0.0001,
-        paramwise_cfg=dict(custom_keys=dict(backbone={"lr_mult": 0.2})),
     ),
 )
 

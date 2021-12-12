@@ -60,6 +60,7 @@ def trainval(cfg, distributed, logger):
 
     looper = EpochBasedLooper(cfg.modes, dataloaders, engines, hook_pool,
                               logger, cfg.workdir)
+    looper.max_epochs = cfg.max_epochs
 
     if isinstance(looper, EpochBasedLooper):
         looper.hook_pool.register_hook(dict(typename='WorkerInitHook'))

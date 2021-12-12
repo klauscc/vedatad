@@ -7,6 +7,7 @@ from .test_time_aug import OverlapCropAug
 from .transforms import (Normalize, Pad, PhotoMetricDistortion, Rotate,
                          SpatialCenterCrop, SpatialRandomCrop,
                          SpatialRandomFlip, TemporalCrop, TemporalRandomCrop)
+from .mem_mechanism import ChunkFreeze, LoadFeatureFromMemBank
 
 __all__ = [
     'Compose', 'to_tensor', 'ToTensor', 'ImageToTensor', 'ToDataContainer',
@@ -14,5 +15,6 @@ __all__ = [
     'SpatialRandomFlip', 'Pad', 'SpatialRandomCrop', 'Normalize',
     'PhotoMetricDistortion', 'AutoAugment', 'Time2Frame', 'TemporalRandomCrop',
     'Rotate', 'DefaultFormatBundle', 'LoadMetaInfo', 'SpatialCenterCrop',
-    'TemporalCrop', 'LoadFrames'
+    'TemporalCrop', 'LoadFrames',
+    "ChunkFreeze", "LoadFeatureFromMemBank",
 ]

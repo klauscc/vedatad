@@ -10,7 +10,7 @@ overlap_ratio = 0.25
 img_dir = "frames_15fps_256x256"
 
 data = dict(
-    samples_per_gpu=4,
+    samples_per_gpu=2,
     workers_per_gpu=4,
     train=dict(
         typename=dataset_type,
@@ -65,8 +65,12 @@ data = dict(
             ),
         ],
     ),
+)
+
 # 2. model
 num_classes = 20
+strides = [8, 16, 32, 64, 128]
+use_sigmoid = True
 scales_per_octave = 5
 octave_base_scale = 2
 num_anchors = scales_per_octave
@@ -74,9 +78,7 @@ num_anchors = scales_per_octave
 model = dict(
     typename="SingleStageDetector",
     backbone=dict(
-        typename="GradDropChunkVideoSwinV2",
-        bp_idx_mode="random",
-        keep_ratio=0.2,
+        typename="ChunkVideoSwin",
         chunk_size=32,
         frozen_stages=2,
         use_checkpoint=True,
@@ -178,13 +180,7 @@ train_engine = dict(
             debug=False,
         ),
     ),
-    optimizer=dict(
-        typename="SGD",
-        lr=0.01,
-        momentum=0.9,
-        weight_decay=0.0001,
-        paramwise_cfg=dict(custom_keys=dict(backbone={"lr_mult": 0.2})),
-    ),
+    optimizer=dict(typename="SGD", lr=0.01, momentum=0.9, weight_decay=0.0001),
 )
 
 # 3.2 val engine
