@@ -6,15 +6,15 @@ img_norm_cfg = dict(
 )
 num_frames = 480
 chunk_size = 32
-img_shape = (224, 224)
+img_shape = (112, 112)
 overlap_ratio = 0.25
 keep_ratio = 0.4
 feat_downsample = 2
-expid = "3.b.i"
+expid = "3.c.i"
 
 data = dict(
     samples_per_gpu=4,
-    workers_per_gpu=4,
+    workers_per_gpu=6,
     train=dict(
         typename=dataset_type,
         ann_file=data_root + "annotations/val.json",
@@ -87,21 +87,32 @@ model = dict(
         do_pooling=True,
         patch_size=(2, 4, 4),
         in_chans=3,
+        embed_dim=96,
+        drop_path_rate=0.1,
+        depths=[2, 2, 6, 2],
+        num_heads=[3, 6, 12, 24],
         window_size=(8, 7, 7),
-        embed_dim=128,
-        drop_path_rate=0.2,
-        depths=[2, 2, 18, 2],
-        num_heads=[4, 8, 16, 32],
         patch_norm=True,
         frozen_stages=2,
-        use_checkpoint=True,
+        use_checkpoint=False,
     ),
     neck=[
         dict(
             typename="SRMSwin",
             srm_cfg=dict(
-                in_channels=1024,
+                in_channels=768,
                 out_channels=512,
+                with_transformer=True,
+                transformer=dict(
+                    num_layers=1,
+                    encoder_layer=dict(
+                        d_model=512,
+                        nhead=8,
+                        dim_feedforward=2048,
+                        dropout=0.1,
+                        activation="relu",
+                    ),
+                ),
             ),
         ),
         dict(
@@ -160,8 +171,8 @@ train_engine = dict(
         keep_ratio=keep_ratio,
         feat_downsample=feat_downsample,
         mode="random",
-        mem_bank_meta_file=f"data/tmp/thumos14/memory_mechanism/{expid}/feat_swinb_15fps_256x256_crop224x224/meta_val.json",
-        mem_bank_dir=f"data/tmp/thumos14/memory_mechanism/{expid}/feat_swinb_15fps_256x256_crop224x224/val",
+        mem_bank_meta_file=f"data/tmp/thumos14/memory_mechanism/{expid}/feat_swint_15fps_128x128_crop112x112/meta_val.json",
+        mem_bank_dir=f"data/tmp/thumos14/memory_mechanism/{expid}/feat_swint_15fps_128x128_crop112x112/val",
     ),
     model=model,
     criterion=dict(
@@ -245,7 +256,7 @@ max_epochs = 1200
 # 6. checkpoint
 # weights = dict(filepath='open-mmlab://i3d_r50_256p_32x2x1_100e_kinetics400_rgb')
 weights = dict(
-    filepath="data/pretrained_models/vswin/swin_base_patch244_window877_kinetics400_22k_keysfrom_backbone.pth"
+    filepath="data/pretrained_models/vswin/swin_tiny_patch244_window877_kinetics400_1k_keysfrom_backbone.pth"
 )
 # optimizer = dict(filepath='epoch_900_optim.pth')
 # meta = dict(filepath='epoch_900_meta.pth')

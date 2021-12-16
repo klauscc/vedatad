@@ -7,6 +7,7 @@
 #
 # ================================================================
 from glob import glob
+from inspect import findsource
 import json
 import os
 from vedatad.models.builder import build_backbone
@@ -91,7 +92,6 @@ CHUNK_SIZE = 32
 IMG_MEAN = torch.tensor([123.675, 116.28, 103.53], device=device)
 IMG_STD = torch.tensor([58.395, 57.12, 57.375], device=device)
 ########################################
-
 
 def load_video(video_path):
     """load frames

@@ -8,11 +8,10 @@
 # ================================================================
 
 
+import os
 from vedatad.models.backbones.vswin import SwinTransformer3D
 import torch
 import torch.nn.functional as F
-from vedatad.models.builder import build_backbone
-from torch import nn
 from vedacore.misc import registry
 
 
@@ -26,10 +25,50 @@ class ChunkVideoSwin(SwinTransformer3D):
 
         self.pool = torch.nn.AdaptiveAvgPool3d([None, 1, 1]) if do_pooling else None
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor):
         """
         Args:
-            x (Tensor[B,C,D,H,W]): input.
+            x (torch.Tensor): inputs in two format:
+                    1) chunk-first. shape: (num_chunks, B, C, chunk_size, H, W).
+                    Returned feature is also chunk-first.
+                    2) batch-first. shape: (B, C, D, H, W). Returned feature is
+                    batch-first.
+        """
+        if x.dim() == 6:  # chunk first
+            return self.forward_chunk_inp_output(x)
+        elif x.dim() == 5:  # batch-first
+            return self.forward_nochunk_inp_output(x)
+
+    def forward_chunk_inp_output(self, x):
+        """
+        Args:
+            x (torch.Tensor): input with shape (num_chunks, B, C, chunk_size, H, W)
+
+        Returns: torch.Tensor. The extract features.
+            If `do_pooling` is True, the returned shape is (num_chunks, B, C, feat_chunk_size),
+            else is (num_chunks, B, C, feat_chunk_size, H', W')
+        """
+        num_chunks, B, C, chunk_size, H, W = x.shape
+        x = x.reshape(num_chunks * B, C, chunk_size, H, W)
+        x = super().forward(x)  # shape: [n, c, d, h, w]
+        _, c, d, h, w = x.shape
+        return_shape = (num_chunks, B, c, d, h, w)
+        if self.pool:
+            x = self.pool(x)
+            x = x.squeeze(-1).squeeze(-1)
+            return_shape = (num_chunks, B, c, d)
+        return x.reshape(return_shape)
+
+    def forward_nochunk_inp_output(self, x):
+        """input is not chunk-first. During forward, first divide input into chunks
+        and then first each chunks and reshape the output back to original format.
+
+        Args:
+            x (torch.Tensor): input with shape (B,C,D,H,W).
+
+        Returns: torch.Tensor. The extract features.
+            If `do_pooling` is True, the returned shape is (B, C1, D1),
+            else is (B, C1, D1, H1, W1)
         """
         B, C, D, H, W = x.shape
         chunk_size = self.chunk_size
@@ -45,7 +84,7 @@ class ChunkVideoSwin(SwinTransformer3D):
             .reshape(B * num_chunks, C, chunk_size, H, W)
         )
         x = super().forward(x)  # shape: [n, c, d, h, w]
-        n, c, d, h, w = x.shape
+        _, c, d, h, w = x.shape
         x = (
             x.reshape(B, num_chunks, c, d, h, w)
             .permute(0, 2, 1, 3, 4, 5)
@@ -82,7 +121,7 @@ class ChunkVideoSwinWithChunkInput(SwinTransformer3D):
         num_chunks, B, C, chunk_size, H, W = x.shape
         x = x.reshape(num_chunks * B, C, chunk_size, H, W)
         x = super().forward(x)  # shape: [n, c, d, h, w]
-        n, c, d, h, w = x.shape
+        _, c, d, h, w = x.shape
         return_shape = (num_chunks, B, c, d, h, w)
         if self.pool:
             x = self.pool(x)
