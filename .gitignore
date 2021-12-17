@@ -10,7 +10,7 @@ tags
 
 # Distribution / packaging
 .Python
-build/
+built/
 develop-eggs/
 dist/
 downloads/
@@ -132,7 +132,6 @@ dmypy.json
 
 # custom
 workdir/
-tests/
 
 eval_dirs/
 nohup.out

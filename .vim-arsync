@@ -1,0 +1,19 @@
+remote_host    opr
+remote_passwd  Wscf931023&@
+remote_path     ~/stor/projects/temporal-action-detection/vedatad
+
+#remote_host    den
+#remote_path     /shenlab/lab_stor/fengchan/projects/cv/temporal-action-detection
+
+#remote_host     long
+#remote_path     /nas/longleaf/home/fengchan/projects/cv/temporal-action-detection
+
+
+remote_user    fengchan
+#remote_port    22 
+local_path      ../vedatad
+ignore_path     ["pretrained_models"]
+ignore_dotfiles 1
+auto_sync_up    0
+remote_or_local remote
+sleep_before_sync 0

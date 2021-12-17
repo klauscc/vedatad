@@ -157,14 +157,22 @@ python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
 
 <<COMMENT
 # 2.b.ii.3
-workdir=workdir/2.b.ii.3-run1
+workdir=workdir/2.b.ii.3-orig_run1
 config=configs/trainval/daotad/2.b.ii.3.py
-tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+tools/dist_trainval.sh $config "4,5,6,7" --workdir $workdir
 # Testing chunk
-workdir=workdir/2.b.ii.3-run1
+workdir=workdir/2.b.ii.3-orig_run1
 config=configs/trainval/daotad/2.b.ii.3.py
 #epoch=900
-for epoch in 700 800 900 1000 1100 1200; do
+for epoch in 400 500 700 800 900 1000 1100 1200; do
+    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+        --out $workdir/results_e$epoch-chunk.pkl
+done
+
+workdir=workdir/2.b.ii.3-run2-split_inference_restore_rng
+config=configs/trainval/daotad/2.b.ii.3.py
+#epoch=900
+for epoch in 400 500 700 800 900 1000 1100 1200; do
     python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
         --out $workdir/results_e$epoch-chunk.pkl
 done
@@ -407,3 +415,41 @@ for epoch in 300 600 800 900 1000 1100 1200 400 500; do
 done
 COMMENT
 
+# 4.a.ii
+workdir=workdir/4.a.ii
+config=configs/trainval/daotad/4.a.ii.py
+tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+# Testing chunk
+workdir=workdir/4.a.ii
+config=configs/trainval/daotad/4.a.ii.py
+#epoch=900
+for epoch in 400 500 600 700 800 900 1000 1100 1200; do
+    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+        --out $workdir/results_e$epoch-chunk.pkl
+done
+
+# 4.a.iii
+workdir=workdir/4.a.iii
+config=configs/trainval/daotad/4.a.iii.py
+tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+# Testing chunk
+workdir=workdir/4.a.iii
+config=configs/trainval/daotad/4.a.iii.py
+#epoch=900
+for epoch in 400 500 600 700 800 900 1000 1100 1200; do
+    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+        --out $workdir/results_e$epoch-chunk.pkl
+done
+
+# 4.b.i
+workdir=workdir/4.b.i
+config=configs/trainval/daotad/4.b.i.py
+tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+# Testing chunk
+workdir=workdir/4.b.i
+config=configs/trainval/daotad/4.b.i.py
+#epoch=900
+for epoch in 400 500 600 700 800 900 1000 1100 1200; do
+    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+        --out $workdir/results_e$epoch-chunk.pkl
+done

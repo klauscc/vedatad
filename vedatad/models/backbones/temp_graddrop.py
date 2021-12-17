@@ -231,14 +231,53 @@ class GradDropChunkVideoSwinV2(SwinTransformer3D):
             num_chunks, self.keep_ratio, self.bp_idx_mode
         )
 
-        with torch.no_grad():
-            # y_wo_grad = self.forward_fn(x[drop_indices].contiguous())
-            y_wo_grad = []
-            for idx in drop_indices:
-                y_wo_grad.append(self.forward_fn(x[idx : idx + 1]))
-            y_wo_grad = torch.cat(y_wo_grad, dim=0)
+        # ----- Batch forward ----------
+        # orig v2.
+        def batch_forward():
+            with torch.no_grad():
+                y_wo_grad = self.forward_fn(x[drop_indices].contiguous())
+            y_w_grad = self.forward_fn(x[keep_indices].contiguous())
+            return y_wo_grad, y_w_grad
 
-        y_w_grad = self.forward_fn(x[keep_indices])
+        # --------------------------------
+
+        # ----- Split forward ----------
+        # new v2.
+        def split_forward():
+            with torch.no_grad():
+                y_wo_grad = []
+                for idx in drop_indices:
+                    y_wo_grad.append(self.forward_fn(x[idx : idx + 1].contiguous()))
+                y_wo_grad = torch.cat(y_wo_grad, dim=0)
+            y_w_grad = self.forward_fn(x[keep_indices].contiguous())
+            return y_wo_grad, y_w_grad
+
+        # ----- Split forward restore RNG----------
+        # v3.
+        def split_forward_restore_rng():
+            cpu_rng_state = torch.get_rng_state()
+            gpu_rng_state = torch.cuda.get_rng_state()
+            with torch.no_grad():
+                y_wo_grad = []
+                for idx in drop_indices:
+                    torch.set_rng_state(cpu_rng_state)
+                    torch.cuda.set_rng_state(gpu_rng_state)
+                    y_wo_grad.append(self.forward_fn(x[idx : idx + 1].contiguous()))
+                y_wo_grad = torch.cat(y_wo_grad, dim=0)
+            torch.set_rng_state(cpu_rng_state)
+            torch.cuda.set_rng_state(gpu_rng_state)
+            y_w_grad = self.forward_fn(x[keep_indices].contiguous())
+            return y_wo_grad, y_w_grad
+
+        forward_mode = "batch_forward"
+        if forward_mode == "batch_forward":
+            y_wo_grad, y_w_grad = batch_forward()
+        elif forward_mode == "split_forward":
+            y_wo_grad, y_w_grad = split_forward()
+        elif forward_mode == "split_forward_restore_rng":
+            y_wo_grad, y_w_grad = split_forward_restore_rng()
+        else:
+            raise ValueError(f"forward mode:{forward_mode} not supported")
 
         _, B, C1, D1 = y_w_grad.shape
         y = torch.zeros(num_chunks, B, C1, D1, device=x.device, dtype=x.dtype)
