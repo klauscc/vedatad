@@ -5,12 +5,10 @@ img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True
 )
 num_frames = 480
-chunk_size = 32
-img_shape = (224, 224)
+img_shape = (112, 112)
 overlap_ratio = 0.25
+img_dir = "frames_15fps"
 keep_ratio = 0.4
-feat_downsample = 2
-expid = "3.b.i"
 
 data = dict(
     samples_per_gpu=4,
@@ -18,7 +16,7 @@ data = dict(
     train=dict(
         typename=dataset_type,
         ann_file=data_root + "annotations/val.json",
-        video_prefix=data_root + "frames_15fps_256x256/val",
+        video_prefix=data_root + f"{img_dir}/val",
         pipeline=[
             dict(typename="LoadMetaInfo"),
             dict(typename="LoadAnnotations"),
@@ -48,7 +46,7 @@ data = dict(
     val=dict(
         typename=dataset_type,
         ann_file=data_root + "annotations/test.json",
-        video_prefix=data_root + "frames_15fps_256x256/test",
+        video_prefix=data_root + f"{img_dir}/test",
         pipeline=[
             dict(typename="LoadMetaInfo"),
             dict(typename="Time2Frame"),
@@ -81,26 +79,37 @@ num_anchors = scales_per_octave
 model = dict(
     typename="SingleStageDetector",
     backbone=dict(
-        typename="ChunkVideoSwin",
-        chunk_size=chunk_size,
-        do_pooling=True,
+        typename="GradDropChunkVideoSwinV2",
+        keep_ratio=keep_ratio,
+        chunk_size=32,
         patch_size=(2, 4, 4),
         in_chans=3,
+        embed_dim=96,
+        drop_path_rate=0.1,
+        depths=[2, 2, 6, 2],
+        num_heads=[3, 6, 12, 24],
         window_size=(8, 7, 7),
-        embed_dim=128,
-        drop_path_rate=0.2,
-        depths=[2, 2, 18, 2],
-        num_heads=[4, 8, 16, 32],
         patch_norm=True,
         frozen_stages=2,
-        use_checkpoint=True,
+        use_checkpoint=False,
     ),
     neck=[
         dict(
             typename="SRMSwin",
             srm_cfg=dict(
-                in_channels=1024,
+                in_channels=768,
                 out_channels=512,
+                with_transformer=True,
+                transformer=dict(
+                    num_layers=1,
+                    encoder_layer=dict(
+                        d_model=512,
+                        nhead=8,
+                        dim_feedforward=2048,
+                        dropout=0.1,
+                        activation="relu",
+                    ),
+                ),
             ),
         ),
         dict(
@@ -153,15 +162,7 @@ segment_coder = dict(
 )
 
 train_engine = dict(
-    typename="MemBankTrainEngine",
-    membank=dict(
-        chunk_size=chunk_size,
-        keep_ratio=keep_ratio,
-        feat_downsample=feat_downsample,
-        mode="random",
-        mem_bank_meta_file=f"data/tmp/thumos14/memory_mechanism/{expid}/feat_swinb_15fps_256x256_crop224x224/meta_val.json",
-        mem_bank_dir=f"data/tmp/thumos14/memory_mechanism/{expid}/feat_swinb_15fps_256x256_crop224x224/val",
-    ),
+    typename="TrainEngine",
     model=model,
     criterion=dict(
         typename="SegmentAnchorCriterion",
@@ -244,13 +245,13 @@ max_epochs = 1200
 # 6. checkpoint
 # weights = dict(filepath='open-mmlab://i3d_r50_256p_32x2x1_100e_kinetics400_rgb')
 weights = dict(
-    filepath="data/pretrained_models/vswin/swin_base_patch244_window877_kinetics400_22k_keysfrom_backbone.pth"
+    filepath="data/pretrained_models/vswin/swin_tiny_patch244_window877_kinetics400_1k_keysfrom_backbone.pth"
 )
 # optimizer = dict(filepath='epoch_900_optim.pth')
 # meta = dict(filepath='epoch_900_meta.pth')
 
 # 7. misc
-seed = 10
+seed = 30
 dist_params = dict(backend="nccl")
 log_level = "INFO"
 find_unused_parameters = False

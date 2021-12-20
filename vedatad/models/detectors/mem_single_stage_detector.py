@@ -65,16 +65,23 @@ class MemSingleStageDetector(BaseDetector):
         feats = self.head(feats)
         return feats, bp_features
 
-    def forward(self, x, frozen_features, keep_indices, drop_indices, train=True):
+    def forward_eval(self, x):
+        feats = self.backbone(x)
+        if self.neck:
+            feats = self.neck(feats)
+        feats = self.head(feats)
+        return feats
+
+    def forward(
+        self, x, frozen_features=None, keep_indices=None, drop_indices=None, train=True
+    ):
         if train:
             self.train()
             feats = self.forward_impl(x, frozen_features, keep_indices, drop_indices)
         else:
             self.eval()
             with torch.no_grad():
-                feats = self.forward_impl(
-                    x, frozen_features, keep_indices, drop_indices
-                )
+                feats = self.forward_eval(x)
         return feats
 
 
