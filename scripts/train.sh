@@ -403,13 +403,29 @@ cp -r data/thumos14/memory_mechanism/feat_swint_15fps_128x128_crop112x112 data/t
 workdir=workdir/3.d.i
 config=configs/trainval/daotad/3.d.i.py
 tools/dist_trainval.sh $config "4,5,6,7" --workdir $workdir
-# Testing chunk
+# Testing momentum
 workdir=workdir/3.d.i
 config=configs/trainval/daotad/3.d.i.py
-#epoch=700
+epoch=300
 for epoch in 300 600 800 900 1000 1100 1200 400 500; do
     python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
         --out $workdir/results_e$epoch-chunk.pkl
+done
+# Testing vanilla.
+workdir=workdir/3.d.i
+config=configs/trainval/daotad/3.d.i-eval_vanilla.py
+epoch=300
+for epoch in 300 600 800 900 1000 1100 1200 400 500; do
+    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+        --out $workdir/results_e$epoch-chunk-vanilla.pkl
+done
+# Testing combine.
+workdir=workdir/3.d.i
+config=configs/trainval/daotad/3.d.i-eval_combine.py
+epoch=300
+for epoch in 300 600 800 900 1000 1100 1200 400 500; do
+    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+        --out $workdir/results_e$epoch-chunk-combine.pkl
 done
 COMMENT
 
@@ -528,6 +544,21 @@ tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
 # Testing chunk
 workdir=workdir/4.e.ii
 config=configs/trainval/daotad/4.e.ii.py
+#epoch=700
+for epoch in 300 600 800 900 1000 1100 1200 400 500; do
+    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+        --out $workdir/results_e$epoch-chunk.pkl
+done
+
+# 4.e.iii
+mkdir -p data/tmp/thumos14/memory_mechanism/4.e.iii
+cp -r data/thumos14/memory_mechanism/feat_swint_15fps_128x128_crop112x112 data/tmp/thumos14/memory_mechanism/4.e.iii/
+workdir=workdir/4.e.iii
+config=configs/trainval/daotad/4.e.iii.py
+tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+# Testing chunk
+workdir=workdir/4.e.iii
+config=configs/trainval/daotad/4.e.iii.py
 #epoch=700
 for epoch in 300 600 800 900 1000 1100 1200 400 500; do
     python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \

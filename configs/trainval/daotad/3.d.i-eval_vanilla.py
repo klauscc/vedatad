@@ -10,7 +10,7 @@ img_shape = (112, 112)
 overlap_ratio = 0.25
 keep_ratio = 0.4
 feat_downsample = 2
-expid = "4.e.ii"
+expid = "3.a.i"
 
 data = dict(
     samples_per_gpu=4,
@@ -79,8 +79,11 @@ octave_base_scale = 2
 num_anchors = scales_per_octave
 
 model = dict(
-    typename="MemSingleStageDetector",
+    typename="MomentMemSingleStageDetector",
     chunk_size=chunk_size,
+    momentum=0.9,
+    keep_ratio=keep_ratio,
+    eval_mode="vanilla",
     backbone=dict(
         typename="ChunkVideoSwin",
         chunk_size=chunk_size,
@@ -102,17 +105,6 @@ model = dict(
             srm_cfg=dict(
                 in_channels=768,
                 out_channels=512,
-                with_transformer=True,
-                transformer=dict(
-                    num_layers=1,
-                    encoder_layer=dict(
-                        d_model=512,
-                        nhead=8,
-                        dim_feedforward=2048,
-                        dropout=0.1,
-                        activation="relu",
-                    ),
-                ),
             ),
         ),
         dict(
@@ -262,7 +254,7 @@ weights = dict(
 # meta = dict(filepath='epoch_900_meta.pth')
 
 # 7. misc
-seed = 30
+seed = 10
 dist_params = dict(backend="nccl")
 log_level = "INFO"
 find_unused_parameters = False

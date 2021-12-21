@@ -10,7 +10,7 @@ img_shape = (112, 112)
 overlap_ratio = 0.25
 keep_ratio = 0.4
 feat_downsample = 2
-expid = "4.e.i"
+expid = "4.e.iii"
 
 data = dict(
     samples_per_gpu=4,
