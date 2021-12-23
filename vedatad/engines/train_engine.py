@@ -44,6 +44,11 @@ class MemBankTrainEngine(BaseEngine):
         self.criterion = build_criterion(criterion)
         self.optimizer = build_optimizer(self.model, optimizer)
 
+        if hasattr(self.membank, "frozen") and self.membank["frozen"]:
+            self.frozen = True
+        else:
+            self.frozen = False
+
         with open(self.membank["mem_bank_meta_file"], "r") as f:
             self.membank_metas = json.load(f)
 
@@ -111,27 +116,27 @@ class MemBankTrainEngine(BaseEngine):
 
         ## shape: [B, num_keep_chunks, C, feat_chunk_size]
         t3 = time()
-        update_feats = update_feats.detach().cpu().numpy()
+        if not self.frozen:
+            update_feats = update_feats.detach().cpu().numpy()
+            for i, video_meta in enumerate(video_metas):
+                video_name, tshift = video_meta["video_name"], video_meta["tshift"]
+                video_name = os.path.basename(video_name)
+                f_offset = tshift // self.membank["feat_downsample"]
+                mem_bank_file = os.path.join(
+                    self.membank["mem_bank_dir"], video_name + ".mmap"
+                )
+                membank_shape = tuple(self.membank_metas[video_name]["feat_shape"])
 
-        for i, video_meta in enumerate(video_metas):
-            video_name, tshift = video_meta["video_name"], video_meta["tshift"]
-            video_name = os.path.basename(video_name)
-            f_offset = tshift // self.membank["feat_downsample"]
-            mem_bank_file = os.path.join(
-                self.membank["mem_bank_dir"], video_name + ".mmap"
-            )
-            membank_shape = tuple(self.membank_metas[video_name]["feat_shape"])
-
-            write_features(
-                features=update_feats[:, i],
-                mem_bank_file=mem_bank_file,
-                shape=membank_shape,
-                chunk_ids=keep_indices,
-                chunk_size=feat_chunk_size,
-                f_offset=f_offset,
-            )
-        t4 = time()
-        # print(f"update memory bank cost {t4-t3}s")
+                write_features(
+                    features=update_feats[:, i],
+                    mem_bank_file=mem_bank_file,
+                    shape=membank_shape,
+                    chunk_ids=keep_indices,
+                    chunk_size=feat_chunk_size,
+                    f_offset=f_offset,
+                )
+            t4 = time()
+            # print(f"update memory bank cost {t4-t3}s")
 
         losses = self.criterion.loss(
             final_feats, video_metas, gt_segments, gt_labels, gt_segments_ignore
