@@ -564,3 +564,18 @@ for epoch in 300 600 800 900 1000 1100 1200 400 500; do
     python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
         --out $workdir/results_e$epoch-chunk.pkl
 done
+
+# 5.a.i
+mkdir -p data/tmp/thumos14/memory_mechanism/5.a.i
+cp -r data/thumos14/memory_mechanism/feat_swinb_15fps_256x256_crop224x224 data/tmp/thumos14/memory_mechanism/5.a.i/
+workdir=workdir/5.a.i
+config=configs/trainval/daotad/5.a.i.py
+tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+# Testing chunk
+workdir=workdir/5.a.i
+config=configs/trainval/daotad/5.a.i.py
+#epoch=500
+for epoch in 300 600 800 700 400 500 900 1000 1100 1200; do
+    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+        --out $workdir/results_e$epoch-chunk.pkl
+done
