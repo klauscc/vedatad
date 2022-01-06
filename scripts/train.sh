@@ -654,3 +654,18 @@ epoch=900
     python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
         --out $workdir/results_e$epoch-chunk.pkl
 done
+
+# 6.a.ii.2
+mkdir -p data/tmp/thumos14/memory_mechanism/6.a.ii.2
+cp -r data/thumos14/memory_mechanism/feat_swint_15fps_128x128_crop112x112 data/tmp/thumos14/memory_mechanism/6.a.ii.2/
+workdir=workdir/6.a.ii.2
+config=configs/trainval/daotad/6.a.ii.2.py
+tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+# Testing chunk
+workdir=workdir/6.a.ii.2
+config=configs/trainval/daotad/6.a.ii.2.py
+# epoch=900
+for epoch in 600 800 700 900 500 1000 1100 400 300 1200 ; do
+    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+        --out $workdir/results_e$epoch-chunk.pkl
+done
