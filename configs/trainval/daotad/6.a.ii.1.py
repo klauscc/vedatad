@@ -105,6 +105,7 @@ model = dict(
                 with_transformer=True,
                 transformer=dict(
                     num_layers=1,
+                    pos_enc=True,
                     encoder_layer=dict(
                         d_model=512,
                         nhead=8,

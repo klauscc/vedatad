@@ -40,18 +40,19 @@ class AttnFPN(nn.Module):
             in_channels,
             out_channels,
             kernel_size=1,
+            conv_cfg=dict(typename="Conv1d"),
             norm_cfg=None,
             act_cfg=dict(typename="ReLU"),
         )
 
-        self.pe = PositionalEncoding(out_channels)
+        self.pe = PositionalEncoding(out_channels, scale_pe=True)
 
         decoder_layer = TransformerDecoderLayer(
             out_channels, nhead=8, dim_feedforward=1024, dropout=0.1, activation="relu"
         )
         self.trans_decoder = TransformerDecoder(decoder_layer, num_layers=num_layers)
 
-    def init_weight(self):
+    def init_weights(self):
         if isinstance(self.neck, nn.Sequential):
             for m in self.neck:
                 m.init_weights()
@@ -68,10 +69,12 @@ class AttnFPN(nn.Module):
 
         """
         pyramid_features = self.neck(x)
-        high_res_feat = self.conv(x)
+        high_res_feat = self.conv(x).permute(2, 0, 1)  # shape: [T1,B,C]
         outs = []
-        for f in pyramid_features:
-            f = self.pe(f * math.sqrt(self.out_channels))
+        for f in pyramid_features:  # shape: [B,C,T]
+            f = f.permute(2, 0, 1)  # shape: [T,B,C]
+            f = self.pe(f)
             f = self.trans_decoder(f, high_res_feat)
+            f = f.permute(1, 2, 0)  # shape: [B,C,T]
             outs.append(f)
         return outs

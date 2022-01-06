@@ -42,7 +42,8 @@ class SRMSwin(nn.Module):
 
             # positional encoding
             if hasattr(trans_cfg, "pos_enc"):
-                self.pe = PositionalEncoding(out_channels)
+                # self.pe = PositionalEncoding(out_channels)
+                self.pe = PositionalEncoding(out_channels, scale_pe=True)
             else:
                 self.pe = None
 
@@ -66,7 +67,7 @@ class SRMSwin(nn.Module):
         if self.with_transformer:
             x = x.permute(2, 0, 1)  # [D2, B, C2]
             if self.pe:
-                x *= math.sqrt(self.out_channels)
+                # x *= math.sqrt(self.out_channels)
                 x = self.pe(x)
             x = self.encoder(x)
             x = x.permute(1, 2, 0)  # [B, C2, D2]
