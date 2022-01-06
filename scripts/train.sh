@@ -620,7 +620,7 @@ tools/dist_trainval.sh $config "4,5,6,7" --workdir $workdir
 workdir=workdir/5.c.ii
 config=configs/trainval/daotad/5.c.ii.py
 # epoch=400
-for epoch in 600 800 700 400 500 900 1000 1100 1200 300; do
+for epoch in 600 800 700 400 500 900 1000 1100 300 1200; do
     python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
         --out $workdir/results_e$epoch-chunk.pkl
 done
@@ -635,7 +635,22 @@ tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
 workdir=workdir/6.a.ii.1
 config=configs/trainval/daotad/6.a.ii.1.py
 # epoch=400
-for epoch in 600 800 700 400 500 900 1000 1100 1200 300; do
+for epoch in 600 800 700 900 400 500 1000 1100 300 1200; do
+    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+        --out $workdir/results_e$epoch-chunk.pkl
+done
+
+# 6.a.iii.1
+mkdir -p data/tmp/thumos14/memory_mechanism/6.a.iii.1
+cp -r data/thumos14/memory_mechanism/feat_swint_15fps_128x128_crop112x112 data/tmp/thumos14/memory_mechanism/6.a.iii.1/
+workdir=workdir/6.a.iii.1
+config=configs/trainval/daotad/6.a.iii.1.py
+tools/dist_trainval.sh $config "4,5,6,7" --workdir $workdir
+# Testing chunk
+workdir=workdir/6.a.iii.1
+config=configs/trainval/daotad/6.a.iii.1.py
+epoch=900
+# for epoch in 600 800 700 900 500 1000 1100  400 300 1200 ; do
     python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
         --out $workdir/results_e$epoch-chunk.pkl
 done

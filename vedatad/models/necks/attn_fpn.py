@@ -16,6 +16,30 @@ from vedacore.misc import registry
 
 
 @registry.register_module("neck")
+class DummyFPN(nn.Module):
+
+    """convert non-FPN to 1-level FPN"""
+
+    def __init__(self, in_channels, out_channels):
+        super().__init__()
+
+        self.proj_out = ConvModule(
+            in_channels,
+            out_channels,
+            kernel_size=1,
+            conv_cfg=dict(typename="Conv1d"),
+            norm_cfg=None,
+            act_cfg=dict(typename="ReLU"),
+        )
+
+    def forward(self, x):
+        return [self.proj_out(x)]
+
+    def init_weights(self):
+        pass
+
+
+@registry.register_module("neck")
 class AttnFPN(nn.Module):
 
     """FPN with skip connection"""
