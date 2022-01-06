@@ -1,3 +1,5 @@
+import math
+import torch
 import torch.nn as nn
 
 from vedacore.misc import build_from_module, registry
@@ -18,6 +20,7 @@ class SRMSwin(nn.Module):
 
         in_channels = srm_cfg["in_channels"]
         out_channels = srm_cfg["out_channels"]
+        self.out_channels = out_channels
 
         self.pooling = nn.AdaptiveAvgPool3d([None, 1, 1])
         self.conv1 = nn.Conv1d(
@@ -63,6 +66,7 @@ class SRMSwin(nn.Module):
         if self.with_transformer:
             x = x.permute(2, 0, 1)  # [D2, B, C2]
             if self.pe:
+                x *= math.sqrt(self.out_channels)
                 x = self.pe(x)
             x = self.encoder(x)
             x = x.permute(1, 2, 0)  # [B, C2, D2]

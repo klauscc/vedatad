@@ -1,4 +1,5 @@
 remote_host    opr
+# remote_host    meg
 remote_passwd  Wscf931023&@
 remote_path     ~/stor/projects/temporal-action-detection/vedatad
 
