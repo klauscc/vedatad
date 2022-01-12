@@ -2,7 +2,7 @@ import math
 import torch
 import torch.nn as nn
 
-from vedacore.misc import build_from_module, registry
+from vedacore.misc import build_from_module, registry, build_from_cfg
 from vedatad.models.modules.positional_encoding import PositionalEncoding
 from vedatad.models.modules.transformer import (
     TransformerEncoder,
@@ -41,9 +41,12 @@ class SRMSwin(nn.Module):
             )
 
             # positional encoding
-            if hasattr(trans_cfg, "pos_enc"):
-                # self.pe = PositionalEncoding(out_channels)
-                self.pe = PositionalEncoding(out_channels, scale_pe=True)
+            if hasattr(trans_cfg, "pos_enc") and trans_cfg["pos_enc"]:
+                pos_enc = trans_cfg["pos_enc"]
+                if isinstance(pos_enc, dict):
+                    self.pe = build_from_cfg(pos_enc, registry, "pos_enc")
+                else:
+                    self.pe = PositionalEncoding(out_channels, scale_pe=True)
             else:
                 self.pe = None
 
