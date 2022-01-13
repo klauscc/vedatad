@@ -4,6 +4,7 @@ import torch.nn as nn
 
 from vedacore.misc import build_from_module, registry, build_from_cfg
 from vedatad.models.modules.positional_encoding import PositionalEncoding
+from vedatad.models.modules.swin_1d import Encoder, EncoderLayer1D
 from vedatad.models.modules.transformer import (
     TransformerEncoder,
     TransformerEncoderLayer,
@@ -75,3 +76,34 @@ class SRMSwin(nn.Module):
             x = self.encoder(x)
             x = x.permute(1, 2, 0)  # [B, C2, D2]
         return x
+
+
+@registry.register_module("neck")
+class Transformer1DRelPos(nn.Module):
+
+    """Docstring for Transformer1DRelPos."""
+
+    def __init__(self, encoder_layer_cfg: dict, num_layers: int):
+
+        super().__init__()
+        encoder_layer = EncoderLayer1D(**encoder_layer_cfg)
+        self.encoder = Encoder(encoder_layer, num_layers)
+
+    def init_weights(self):
+        pass
+
+    def forward(self, x: torch.Tensor):
+        """forward function
+
+        Args:
+            x (torch.Tensor): input with shape: [B,C,D].
+
+        Returns: torch.Tensor. The same shape as input.
+
+        """
+
+        x = x.permute(0, 2, 1)  # [B,C,D] -> [B,D,C]
+
+        x = self.encoder(x)  # [B,D,C]
+
+        return x.permute(0, 2, 1)  # [B,C,D]

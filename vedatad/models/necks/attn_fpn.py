@@ -47,7 +47,14 @@ class AttnFPN(nn.Module):
 
     """FPN with skip connection"""
 
-    def __init__(self, in_channels, out_channels, num_layers, neck_module_cfg):
+    def __init__(
+        self,
+        in_channels,
+        out_channels,
+        num_layers,
+        neck_module_cfg,
+        norm_cfg: dict = None,
+    ):
         """TODO: to be defined.
 
         Args:
@@ -55,6 +62,7 @@ class AttnFPN(nn.Module):
             out_channels (int): The out_channels of FPN.
             neck_module_cfg (list or dict): The neck module config.
                 Default to
+            conv_norm (dict): The norm for the convolution that project backbone feature to the key/value of the cross-attention.
 
         """
         super(AttnFPN, self).__init__()
@@ -69,7 +77,7 @@ class AttnFPN(nn.Module):
             out_channels,
             kernel_size=1,
             conv_cfg=dict(typename="Conv1d"),
-            norm_cfg=None,
+            norm_cfg=norm_cfg,
             act_cfg=dict(typename="ReLU"),
         )
 
