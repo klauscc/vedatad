@@ -1,3 +1,5 @@
+from typing import Sequence
+import torch
 import torch.nn as nn
 from torch.nn.modules.batchnorm import _BatchNorm
 from torch.nn.modules.conv import _ConvNd
@@ -7,22 +9,24 @@ from vedacore.misc import registry
 from vedacore.modules import ConvModule, constant_init, kaiming_init
 
 
-@registry.register_module('neck')
+@registry.register_module("neck")
 class TDM(nn.Module):
     """Temporal Down-Sampling Module."""
 
-    def __init__(self,
-                    in_channels,
-                    stage_layers=(1, 1, 1, 1),
-                    kernel_sizes=3,
-                    strides=2,
-                    paddings=1,
-                    dilations=1,
-                    out_channels=256,
-                    conv_cfg=dict(typename='Conv1d'),
-                    norm_cfg=dict(typename='BN1d'),
-                    act_cfg=dict(typename='ReLU'),
-                    out_indices=(0, 1, 2, 3, 4)):
+    def __init__(
+        self,
+        in_channels,
+        stage_layers=(1, 1, 1, 1),
+        kernel_sizes=3,
+        strides=2,
+        paddings=1,
+        dilations=1,
+        out_channels=256,
+        conv_cfg=dict(typename="Conv1d"),
+        norm_cfg=dict(typename="BN1d"),
+        act_cfg=dict(typename="ReLU"),
+        out_indices=(0, 1, 2, 3, 4),
+    ):
         super(TDM, self).__init__()
 
         self.in_channels = in_channels
@@ -38,41 +42,72 @@ class TDM(nn.Module):
         self.act_cfg = act_cfg
         self.out_indices = out_indices
 
-        assert (len(self.stage_layers) == len(self.kernel_sizes) == len(self.strides) == len(self.paddings) ==
-                len(self.dilations) == len(self.out_channels))
+        assert (
+            len(self.stage_layers)
+            == len(self.kernel_sizes)
+            == len(self.strides)
+            == len(self.paddings)
+            == len(self.dilations)
+            == len(self.out_channels)
+        )
 
         self.td_layers = []
         for i in range(self.num_stages):
-            td_layer = self.make_td_layer(self.stage_layers[i], in_channels, self.out_channels[i],
-                                            self.kernel_sizes[i], self.strides[i], self.paddings[i],
-                                            self.dilations[i], self.conv_cfg, self.norm_cfg, self.act_cfg)
+            td_layer = self.make_td_layer(
+                self.stage_layers[i],
+                in_channels,
+                self.out_channels[i],
+                self.kernel_sizes[i],
+                self.strides[i],
+                self.paddings[i],
+                self.dilations[i],
+                self.conv_cfg,
+                self.norm_cfg,
+                self.act_cfg,
+            )
             in_channels = self.out_channels[i]
-            layer_name = f'layer{i + 1}'
+            layer_name = f"layer{i + 1}"
             self.add_module(layer_name, td_layer)
             self.td_layers.append(layer_name)
 
     @staticmethod
-    def make_td_layer(num_layer, in_channels, out_channels, kernel_size, stride, padding, dilation, conv_cfg,
-                        norm_cfg, act_cfg):
+    def make_td_layer(
+        num_layer,
+        in_channels,
+        out_channels,
+        kernel_size,
+        stride,
+        padding,
+        dilation,
+        conv_cfg,
+        norm_cfg,
+        act_cfg,
+    ):
         layers = []
         layers.append(
-            ConvModule(in_channels,
-                        out_channels,
-                        kernel_size=kernel_size,
-                        stride=stride,
-                        padding=padding,
-                        dilation=dilation,
-                        conv_cfg=conv_cfg,
-                        norm_cfg=norm_cfg,
-                        act_cfg=act_cfg))
+            ConvModule(
+                in_channels,
+                out_channels,
+                kernel_size=kernel_size,
+                stride=stride,
+                padding=padding,
+                dilation=dilation,
+                conv_cfg=conv_cfg,
+                norm_cfg=norm_cfg,
+                act_cfg=act_cfg,
+            )
+        )
         for _ in range(1, num_layer):
             layers.append(
-                ConvModule(out_channels,
-                            out_channels,
-                            1,
-                            conv_cfg=conv_cfg,
-                            norm_cfg=norm_cfg,
-                            act_cfg=act_cfg))
+                ConvModule(
+                    out_channels,
+                    out_channels,
+                    1,
+                    conv_cfg=conv_cfg,
+                    norm_cfg=norm_cfg,
+                    act_cfg=act_cfg,
+                )
+            )
 
         return nn.Sequential(*layers)
 
@@ -101,6 +136,42 @@ class TDM(nn.Module):
         for i, layer_name in enumerate(self.td_layers):
             layer = getattr(self, layer_name)
             x = layer(x)
+            if (i + 1) in self.out_indices:
+                outs.append(x)
+        if len(outs) == 1:
+            return outs[0]
+
+        return tuple(outs)
+
+
+@registry.register_module("neck")
+class MultiScaleTDM(TDM):
+
+    """multi-scale TDM"""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def forward(self, inps: Sequence[torch.Tensor]):
+        """TODO: Docstring for forward.
+
+        Args:
+            inps (Sequence[torch.Tensor]): multi-scale features.
+
+        Returns: TODO
+
+        """
+        outs = []
+        num_inp_stages = range(len(inps))
+        x = inps[0]
+        if 0 in self.out_indices:
+            outs.append(x)
+
+        for i, layer_name in enumerate(self.td_layers):
+            layer = getattr(self, layer_name)
+            x = layer(x)
+            if (i + 1) in num_inp_stages:
+                x = x + inps[i + 1]
             if (i + 1) in self.out_indices:
                 outs.append(x)
         if len(outs) == 1:

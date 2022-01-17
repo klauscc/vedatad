@@ -186,7 +186,7 @@ class GradDropChunkVideoSwinV2(SwinTransformer3D):
         self.keep_ratio = keep_ratio
         self.bp_idx_mode = bp_idx_mode
 
-    def forward_fn(self, x):
+    def forward_fn(self, x: torch.Tensor):
         """forward function
 
         Args:
@@ -199,13 +199,23 @@ class GradDropChunkVideoSwinV2(SwinTransformer3D):
         x = x.reshape(
             num_chunks * B, C, chunk_size, H, W
         )  # shape: [num_chunks*B, C,D,H,W]
-        y = super().forward(x)  # shape: [num_chunks*B, C', D', H', W']
-        _, C1, D1, H1, W1 = y.shape
-        y = y.reshape(num_chunks * B, C1, D1, H1, W1)
-        y = torch.nn.functional.adaptive_avg_pool3d(y, [None, 1, 1])
-        y = y.squeeze(-1).squeeze(-1)
-        y = y.reshape(num_chunks, B, C1, D1)
-        return y
+        outs = super().forward(x)  # shape: [num_chunks*B, C', D', H', W']
+
+        def pooling_reshape_feat(x: torch.Tensor):
+            _, C1, D1, H1, W1 = x.shape
+            x = x.reshape(num_chunks * B, C1, D1, H1, W1)
+            x = torch.nn.functional.adaptive_avg_pool3d(x, [None, 1, 1])
+            x = x.squeeze(-1).squeeze(-1)
+            x = x.reshape(num_chunks, B, C1, D1)
+            return x
+
+        if isinstance(outs, (list, tuple)):
+            outs = [pooling_reshape_feat(x) for x in outs]
+        elif isinstance(outs, torch.Tensor):
+            outs = pooling_reshape_feat(outs)
+        else:
+            raise ValueError("not acceptted type.")
+        return outs
 
     def forward(self, x):
         """forward
@@ -252,37 +262,29 @@ class GradDropChunkVideoSwinV2(SwinTransformer3D):
             y_w_grad = self.forward_fn(x[keep_indices].contiguous())
             return y_wo_grad, y_w_grad
 
-        # ----- Split forward restore RNG----------
-        # v3.
-        def split_forward_restore_rng():
-            cpu_rng_state = torch.get_rng_state()
-            gpu_rng_state = torch.cuda.get_rng_state()
-            with torch.no_grad():
-                y_wo_grad = []
-                for idx in drop_indices:
-                    torch.set_rng_state(cpu_rng_state)
-                    torch.cuda.set_rng_state(gpu_rng_state)
-                    y_wo_grad.append(self.forward_fn(x[idx : idx + 1].contiguous()))
-                y_wo_grad = torch.cat(y_wo_grad, dim=0)
-            torch.set_rng_state(cpu_rng_state)
-            torch.cuda.set_rng_state(gpu_rng_state)
-            y_w_grad = self.forward_fn(x[keep_indices].contiguous())
-            return y_wo_grad, y_w_grad
-
         forward_mode = "batch_forward"
         if forward_mode == "batch_forward":
             y_wo_grad, y_w_grad = batch_forward()
         elif forward_mode == "split_forward":
             y_wo_grad, y_w_grad = split_forward()
-        elif forward_mode == "split_forward_restore_rng":
-            y_wo_grad, y_w_grad = split_forward_restore_rng()
         else:
             raise ValueError(f"forward mode:{forward_mode} not supported")
 
-        _, B, C1, D1 = y_w_grad.shape
-        y = torch.zeros(num_chunks, B, C1, D1, device=x.device, dtype=x.dtype)
-        y[keep_indices] = y_w_grad
-        y[drop_indices] = y_wo_grad
+        def merge_feats(y_w_grad: torch.Tensor, y_wo_grad: torch.Tensor):
+            _, B, C1, D1 = y_w_grad.shape
+            y = torch.zeros(
+                num_chunks, B, C1, D1, device=y_w_grad.device, dtype=y_w_grad.dtype
+            )
+            y[keep_indices] = y_w_grad
+            y[drop_indices] = y_wo_grad
+            y = y.permute(1, 2, 0, 3).reshape(B, C1, num_chunks * D1)
+            return y
 
-        y = y.permute(1, 2, 0, 3).reshape(B, C1, num_chunks * D1)
-        return y
+        if isinstance(y_w_grad, (list, tuple)):
+            outs = [
+                merge_feats(w_grad, wo_grad)
+                for (w_grad, wo_grad) in zip(y_w_grad, y_wo_grad)
+            ]
+        else:
+            outs = merge_feats(y_w_grad, y_wo_grad)
+        return outs

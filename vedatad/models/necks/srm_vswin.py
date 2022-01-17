@@ -1,8 +1,7 @@
-import math
 import torch
 import torch.nn as nn
 
-from vedacore.misc import build_from_module, registry, build_from_cfg
+from vedacore.misc import registry
 from vedacore.modules.bricks.conv_module import ConvModule
 from vedatad.models.modules.positional_encoding import PositionalEncoding
 from vedatad.models.modules.swin_1d import Encoder, EncoderLayer1D
@@ -196,3 +195,5 @@ class Transformer1DRelPos(nn.Module):
         x = self.encoder(x)  # [B,D,C]
 
         return x.permute(0, 2, 1)  # [B,C,D]
+
+

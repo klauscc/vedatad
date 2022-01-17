@@ -775,6 +775,21 @@ for epoch in 600 800 700 900 500 1000 1100 400 300 1200 ; do
         --out $workdir/results_e$epoch-chunk.pkl
 done
 
+# 6.b.i.4
+mkdir -p data/tmp/thumos14/memory_mechanism/6.b.i.4
+cp -r data/thumos14/memory_mechanism/feat_swinb_15fps_256x256_crop224x224 data/tmp/thumos14/memory_mechanism/6.b.i.4/
+workdir=workdir/6.b.i.4
+config=configs/trainval/daotad/6.b.i.4.py
+tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+# Testing chunk
+workdir=workdir/6.b.i.4
+config=configs/trainval/daotad/6.b.i.4.py
+# epoch=900
+for epoch in 600 800 700 900 500 1000 1100 400 300 1200 ; do
+    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+        --out $workdir/results_e$epoch-chunk.pkl
+done
+
 # 6.a.iv.1
 mkdir -p data/tmp/thumos14/memory_mechanism/6.a.iv.1
 cp -r data/thumos14/memory_mechanism/feat_swint_15fps_128x128_crop112x112 data/tmp/thumos14/memory_mechanism/6.a.iv.1/
@@ -786,6 +801,32 @@ workdir=workdir/6.a.iv.1
 config=configs/trainval/daotad/6.a.iv.1.py
 # epoch=400
 for epoch in 600 800 700 900 400 500 1000 1100 300 1200; do
+    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+        --out $workdir/results_e$epoch-chunk.pkl
+done
+
+# 7.a.i
+workdir=workdir/7.a.i
+config=configs/trainval/daotad/7.a.i.py
+tools/dist_trainval.sh $config "4,5,6,7" --workdir $workdir
+# Testing chunk
+workdir=workdir/7.a.i
+config=configs/trainval/daotad/7.a.i.py
+#epoch=900
+for epoch in 400 500 600 700 800 900 1000 1100 1200; do
+    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+        --out $workdir/results_e$epoch-chunk.pkl
+done
+
+# 7.a.ii
+workdir=workdir/7.a.ii
+config=configs/trainval/daotad/7.a.ii.py
+tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+# Testing chunk
+workdir=workdir/7.a.ii
+config=configs/trainval/daotad/7.a.ii.py
+#epoch=900
+for epoch in 400 500 600 700 800 900 1000 1100 1200; do
     python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
         --out $workdir/results_e$epoch-chunk.pkl
 done
