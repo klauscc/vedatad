@@ -1,4 +1,5 @@
 from typing import Sequence
+from einops.einops import rearrange
 import torch
 import torch.nn as nn
 from torch.nn.modules.batchnorm import _BatchNorm
@@ -7,6 +8,8 @@ from torch.nn.modules.utils import _ntuple
 
 from vedacore.misc import registry
 from vedacore.modules import ConvModule, constant_init, kaiming_init
+from vedatad.models.modules.positional_encoding import PositionalEncoding
+from vedatad.models.modules.transformer import TransformerEncoderLayer
 
 
 @registry.register_module("neck")
@@ -140,6 +143,106 @@ class TDM(nn.Module):
                 outs.append(x)
         if len(outs) == 1:
             return outs[0]
+
+        return tuple(outs)
+
+
+@registry.register_module("neck")
+class SelfAttnTDM(nn.Module):
+
+    """self-attention TDM"""
+
+    def __init__(
+        self,
+        in_channels,
+        stage_layers=(1, 1, 1, 1),
+        num_heads=8,
+        kernel_sizes=None,
+        strides=2,
+        dropout=0.1,
+        out_channels=256,
+        out_indices=(0, 1, 2, 3, 4),
+        out_order="tbc",
+    ):
+        super().__init__()
+        self.in_channels = in_channels
+        self.out_channels = out_channels
+        self.stage_layers = stage_layers
+        self.kernel_sizes = kernel_sizes
+        self.strides = strides
+        self.out_indices = out_indices
+        self.out_order = out_order
+
+        assert out_order in ["tbc", "bct"], "output order must be `tbc` or `bct`"
+
+        self.pe = PositionalEncoding(in_channels, dropout, scale_pe=True)
+
+        self.layers = nn.ModuleList()
+        for i in range(len(stage_layers)):
+            layer_in_c = in_channels * 2 if i == 0 else out_channels * 2
+            layer = nn.Sequential(
+                nn.Linear(layer_in_c, out_channels),
+                nn.LayerNorm(out_channels),
+                TransformerEncoderLayer(
+                    out_channels,
+                    num_heads,
+                    out_channels * 4,
+                    dropout=0.1,
+                    activation="relu",
+                ),
+            )
+            self.layers.append(layer)
+
+    def init_weights(self):
+        """Initiate the parameters."""
+        pass
+
+    def downsample(self, x: torch.Tensor, s: int):
+        """downsample using reshape with pad. If
+
+        Args:
+            x (torch.Tensor): the input to be downsampled. shape: [T,B,C]
+            s (int): stride.
+
+        Returns: downsample with pad.
+
+        """
+        t = x.shape[0]
+        margin = t % s
+        if margin != 0:
+            pad_left = (s - margin) // 2
+            pad_right = (s - margin) - pad_left
+            x = torch.nn.functional.pad(x, pad=(0, 0, 0, 0, pad_left, pad_right))
+        x = rearrange(x, "(t s) b c -> t b (s c)", s=s)
+        return x
+
+    def forward(self, x: torch.Tensor):
+        """forward fn
+
+        Args:
+            x (torch.Tensor): input feature with shape: [B,C,T]
+
+        Returns: TODO
+
+        """
+        x = x.permute(2, 0, 1)  # [B,C,T] -> [T,B,C]
+        x = self.pe(x)
+
+        outs = []
+        if 0 in self.out_indices:
+            outs.append(x)
+
+        for i, layer in enumerate(self.layers):
+            x = self.downsample(x, self.strides)
+            x = layer(x)
+            if (i + 1) in self.out_indices:
+                outs.append(x)  # [T,B,C]
+        if len(outs) == 1:
+            outs = outs[0]
+
+        if self.out_order == "bct":
+            for i in range(len(outs)):
+                outs[i] = outs[i].permute(1, 2, 0)
 
         return tuple(outs)
 

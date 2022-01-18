@@ -683,10 +683,12 @@ class SwinTransformer3D(nn.Module):
         self.num_features = int(embed_dim * 2 ** (self.num_layers - 1))
 
         # add a norm layer for each output
-        # self.norm = norm_layer(self.num_features)
-        self.norm = nn.ModuleList(
-            [norm_layer(out_num_channels[i]) for i in range(len(self.out_indices))]
-        )
+        if len(out_indices) == 1:
+            self.norm = norm_layer(self.num_features)
+        else:
+            self.norm = nn.ModuleList(
+                [norm_layer(out_num_channels[i]) for i in range(len(self.out_indices))]
+            )
 
         self._freeze_stages()
 
@@ -820,7 +822,10 @@ class SwinTransformer3D(nn.Module):
 
         for i, x in enumerate(outs):
             x = rearrange(x, "n c d h w -> n d h w c")
-            x = self.norm[i](x)
+            if len(self.out_indices) == 1:
+                x = self.norm(x)
+            else:
+                x = self.norm[i](x)
             x = rearrange(x, "n d h w c -> n c d h w")
             outs[i] = x
 
