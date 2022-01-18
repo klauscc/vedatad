@@ -121,6 +121,7 @@ model = dict(
             out_channels=512,
             strides=2,
             num_heads=8,
+            kernel_sizes = None,
             stage_layers=(1, 1, 1, 1),
             out_indices=(0, 1, 2, 3, 4),
             out_order="bct",

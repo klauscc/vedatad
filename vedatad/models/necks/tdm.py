@@ -1,3 +1,4 @@
+from functools import lru_cache
 from typing import Sequence
 from einops.einops import rearrange
 import torch
@@ -177,21 +178,23 @@ class SelfAttnTDM(nn.Module):
 
         self.pe = PositionalEncoding(in_channels, dropout, scale_pe=True)
 
-        self.layers = nn.ModuleList()
+        self.reductions = nn.ModuleList()
+        self.trans_layers = nn.ModuleList()
         for i in range(len(stage_layers)):
             layer_in_c = in_channels * 2 if i == 0 else out_channels * 2
-            layer = nn.Sequential(
-                nn.Linear(layer_in_c, out_channels),
+            reduction = nn.Sequential(
+                nn.Linear(layer_in_c, out_channels, bias=False),
                 nn.LayerNorm(out_channels),
-                TransformerEncoderLayer(
-                    out_channels,
-                    num_heads,
-                    out_channels * 4,
-                    dropout=0.1,
-                    activation="relu",
-                ),
             )
-            self.layers.append(layer)
+            trans_layer = TransformerEncoderLayer(
+                out_channels,
+                num_heads,
+                out_channels * 4,
+                dropout=0.1,
+                activation="relu",
+            )
+            self.reductions.append(reduction)
+            self.trans_layers.append(trans_layer)
 
     def init_weights(self):
         """Initiate the parameters."""
@@ -216,6 +219,27 @@ class SelfAttnTDM(nn.Module):
         x = rearrange(x, "(t s) b c -> t b (s c)", s=s)
         return x
 
+    @lru_cache
+    def compute_mask(self, n: int, kernel_size: int, v=-1e9):
+        """compute mask for local attention with kernel size.
+
+        Args:
+            n (int): TODO
+            kernel_size (int): TODO
+
+        Returns: torch.Tensor. shape: [n,n]. The masked locations are -1e9
+            and unmasked locations are 0.
+
+        """
+        if kernel_size is None:
+            return None
+        half = kernel_size // 2
+        mask1 = torch.ones(n, n).triu(diagonal=-half)
+        mask2 = torch.ones(n, n).tril(diagonal=half)
+        mask = mask1 * mask2
+        mask = (1 - mask) * v
+        return mask
+
     def forward(self, x: torch.Tensor):
         """forward fn
 
@@ -232,17 +256,28 @@ class SelfAttnTDM(nn.Module):
         if 0 in self.out_indices:
             outs.append(x)
 
-        for i, layer in enumerate(self.layers):
+        for i, (reduction, trans_layer) in enumerate(
+            zip(self.reductions, self.trans_layers)
+        ):
             x = self.downsample(x, self.strides)
-            x = layer(x)
+            x = reduction(x)
+            mask = self.compute_mask(x.shape[0], kernel_size=self.kernel_sizes)
+            if mask is not None:
+                mask = mask.to(x.device)
+            x = trans_layer(x, mask)
+
             if (i + 1) in self.out_indices:
                 outs.append(x)  # [T,B,C]
+
         if len(outs) == 1:
             outs = outs[0]
 
         if self.out_order == "bct":
             for i in range(len(outs)):
                 outs[i] = outs[i].permute(1, 2, 0)
+
+        # for i, out in enumerate(outs):
+        #     print(i, out.shape)
 
         return tuple(outs)
 
