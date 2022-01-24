@@ -3,10 +3,18 @@ from .custom import CustomDataset
 from .dataset_wrappers import (ClassBalancedDataset, ConcatDataset,
                                RepeatDataset)
 from .samplers import DistributedGroupSampler, DistributedSampler, GroupSampler
-from .thumos14 import Thumos14Dataset
+from .thumos14 import ANetDataset, Thumos14Dataset
 
 __all__ = [
-    'CustomDataset', 'Thumos14Dataset', 'GroupSampler',
-    'DistributedGroupSampler', 'DistributedSampler', 'build_dataloader',
-    'ConcatDataset', 'RepeatDataset', 'ClassBalancedDataset', 'build_dataset'
+    "CustomDataset",
+    "Thumos14Dataset",
+    "ANetDataset",
+    "GroupSampler",
+    "DistributedGroupSampler",
+    "DistributedSampler",
+    "build_dataloader",
+    "ConcatDataset",
+    "RepeatDataset",
+    "ClassBalancedDataset",
+    "build_dataset",
 ]

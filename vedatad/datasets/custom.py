@@ -12,7 +12,7 @@ from vedatad.misc.evaluation import eval_map
 from .pipelines import Compose
 
 
-@registry.register_module('dataset')
+@registry.register_module("dataset")
 class CustomDataset(Dataset):
     """Custom dataset for temporal action detection.
 
@@ -50,13 +50,15 @@ class CustomDataset(Dataset):
 
     CLASSES = None
 
-    def __init__(self,
-                 ann_file,
-                 pipeline,
-                 classes=None,
-                 video_prefix='',
-                 proposal_file=None,
-                 test_mode=False):
+    def __init__(
+        self,
+        ann_file,
+        pipeline,
+        classes=None,
+        video_prefix="",
+        proposal_file=None,
+        test_mode=False,
+    ):
         self.ann_file = ann_file
         self.video_prefix = video_prefix
         self.proposal_file = proposal_file
@@ -107,7 +109,7 @@ class CustomDataset(Dataset):
             dict: Annotation info of specified index.
         """
 
-        return self.data_infos[idx]['ann']
+        return self.data_infos[idx]["ann"]
 
     def get_cat_ids(self, idx):
         """Get category ids by index.
@@ -119,19 +121,19 @@ class CustomDataset(Dataset):
             list[int]: All categories in the image of specified index.
         """
 
-        return self.data_infos[idx]['ann']['labels'].astype(np.int).tolist()
+        return self.data_infos[idx]["ann"]["labels"].astype(np.int).tolist()
 
     def pre_pipeline(self, results):
         """Prepare results dict for pipeline."""
-        results['video_prefix'] = self.video_prefix
-        results['proposal_file'] = self.proposal_file
-        results['segment_fields'] = []
+        results["video_prefix"] = self.video_prefix
+        results["proposal_file"] = self.proposal_file
+        results["segment_fields"] = []
 
     def _filter_videos(self, min_size=32):
         """Filter images too small."""
         valid_inds = []
         for i, video_info in enumerate(self.data_infos):
-            if min(video_info['width'], video_info['height']) >= min_size:
+            if min(video_info["width"], video_info["height"]) >= min_size:
                 valid_inds.append(i)
         return valid_inds
 
@@ -144,7 +146,7 @@ class CustomDataset(Dataset):
         self.flag = np.zeros(len(self), dtype=np.uint8)
         for i in range(len(self)):
             video_info = self.data_infos[i]
-            if video_info['width'] / video_info['height'] > 1:
+            if video_info["width"] / video_info["height"] > 1:
                 self.flag[i] = 1
 
     def _rand_another(self, idx):
@@ -188,12 +190,12 @@ class CustomDataset(Dataset):
 
         video_info = self.data_infos[idx]
         ann_info = self.get_ann_info(idx)
-        if len(ann_info['segments']) == 0:
+        if len(ann_info["segments"]) == 0:
             return None
 
         results = dict(video_info=video_info, ann_info=ann_info)
         if self.proposals is not None:
-            results['proposals'] = self.proposals[idx]
+            results["proposals"] = self.proposals[idx]
         self.pre_pipeline(results)
         return self.pipeline(results)
 
@@ -211,7 +213,7 @@ class CustomDataset(Dataset):
         video_info = self.data_infos[idx]
         results = dict(video_info=video_info)
         if self.proposals is not None:
-            results['proposals'] = self.proposals[idx]
+            results["proposals"] = self.proposals[idx]
         self.pre_pipeline(results)
         return self.pipeline(results)
 
@@ -237,7 +239,7 @@ class CustomDataset(Dataset):
         elif isinstance(classes, (tuple, list)):
             class_names = classes
         else:
-            raise ValueError(f'Unsupported type {type(classes)} of classes.')
+            raise ValueError(f"Unsupported type {type(classes)} of classes.")
 
         return class_names
 
@@ -246,17 +248,15 @@ class CustomDataset(Dataset):
 
     def _det2json(self, results):
         """Convert detection results to ActivityNet json style."""
-        json_results = dict(
-            version='', results=defaultdict(list), external_data=dict())
+        json_results = dict(version="", results=defaultdict(list), external_data=dict())
         for idx in range(len(self)):
-            video_name = self.data_infos[idx]['video_name']
+            video_name = self.data_infos[idx]["video_name"]
             for label, segments in enumerate(results[idx]):
                 for segment in segments:
                     start, end, score = segment.tolist()
                     label_name = self.CLASSES[label]
-                    res = dict(
-                        segment=[start, end], score=score, label=label_name)
-                    json_results['results'][video_name].append(res)
+                    res = dict(segment=[start, end], score=score, label=label_name)
+                    json_results["results"][video_name].append(res)
         return json_results
 
     def results2json(self, results, outfile_prefix):
@@ -274,7 +274,7 @@ class CustomDataset(Dataset):
         """
 
         json_results = self._det2json(results)
-        result_file = f'{outfile_prefix}.json'
+        result_file = f"{outfile_prefix}.json"
         fileio.dump(json_results, result_file, indent=4)
 
         return result_file
@@ -295,14 +295,16 @@ class CustomDataset(Dataset):
                 tmp_dir is the temporal directory created \
                 for saving json files when jsonfile_prefix is not specified.
         """
-        assert isinstance(results, list), 'results must be a list'
-        assert len(results) == len(self), (
-            'The length of results is not equal to the dataset len: {} != {}'.
-            format(len(results), len(self)))
+        assert isinstance(results, list), "results must be a list"
+        assert len(results) == len(
+            self
+        ), "The length of results is not equal to the dataset len: {} != {}".format(
+            len(results), len(self)
+        )
 
         if jsonfile_prefix is None:
             tmp_dir = tempfile.TemporaryDirectory()
-            jsonfile_prefix = osp.join(tmp_dir.name, 'results')
+            jsonfile_prefix = osp.join(tmp_dir.name, "results")
         else:
             tmp_dir = None
         result_file = self.results2json(results, jsonfile_prefix)
@@ -312,7 +314,7 @@ class CustomDataset(Dataset):
         time_results = []
         _results = deepcopy(results)
         for idx, video_results in enumerate(_results):
-            fps = self.data_infos[idx]['fps']
+            fps = self.data_infos[idx]["fps"]
             res = []
             for class_result in video_results:
                 class_result[:, :2] /= fps
@@ -321,14 +323,16 @@ class CustomDataset(Dataset):
 
         return time_results
 
-    def evaluate(self,
-                 results,
-                 mode='anet',
-                 logger=None,
-                 jsonfile_prefix=None,
-                 iou_thr=0.5,
-                 scale_ranges=None,
-                 convert2time=True):
+    def evaluate(
+        self,
+        results,
+        mode="anet",
+        logger=None,
+        jsonfile_prefix=None,
+        iou_thr=0.5,
+        scale_ranges=None,
+        convert2time=True,
+    ):
         """Evaluate the dataset.
 
         Args:
@@ -368,6 +372,7 @@ class CustomDataset(Dataset):
             iou_thr=iou_thr,
             mode=mode,
             logger=logger,
-            label_names=self.CLASSES)
-        eval_results['mAP'] = mean_ap
+            label_names=self.CLASSES,
+        )
+        eval_results["mAP"] = mean_ap
         return eval_results

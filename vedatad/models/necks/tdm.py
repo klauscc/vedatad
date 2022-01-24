@@ -161,6 +161,7 @@ class SelfAttnTDM(nn.Module):
         kernel_sizes=None,
         strides=2,
         dropout=0.1,
+        add_pe = True,
         out_channels=256,
         out_indices=(0, 1, 2, 3, 4),
         out_order="tbc",
@@ -173,10 +174,15 @@ class SelfAttnTDM(nn.Module):
         self.strides = strides
         self.out_indices = out_indices
         self.out_order = out_order
+        self.add_pe = add_pe
+
+        if isinstance(self.kernel_sizes, int):
+            self.kernel_sizes = [self.kernel_sizes] * len(self.stage_layers)
 
         assert out_order in ["tbc", "bct"], "output order must be `tbc` or `bct`"
 
-        self.pe = PositionalEncoding(in_channels, dropout, scale_pe=True)
+        if self.add_pe:
+            self.pe = PositionalEncoding(in_channels, dropout, scale_pe=True)
 
         self.reductions = nn.ModuleList()
         self.trans_layers = nn.ModuleList()
@@ -250,7 +256,8 @@ class SelfAttnTDM(nn.Module):
 
         """
         x = x.permute(2, 0, 1)  # [B,C,T] -> [T,B,C]
-        x = self.pe(x)
+        if self.add_pe:
+            x = self.pe(x)
 
         outs = []
         if 0 in self.out_indices:
@@ -261,16 +268,15 @@ class SelfAttnTDM(nn.Module):
         ):
             x = self.downsample(x, self.strides)
             x = reduction(x)
-            mask = self.compute_mask(x.shape[0], kernel_size=self.kernel_sizes)
-            if mask is not None:
+            if self.kernel_sizes is not None:
+                mask = self.compute_mask(x.shape[0], kernel_size=self.kernel_sizes[i])
                 mask = mask.to(x.device)
+            else:
+                mask = None
             x = trans_layer(x, mask)
 
             if (i + 1) in self.out_indices:
                 outs.append(x)  # [T,B,C]
-
-        if len(outs) == 1:
-            outs = outs[0]
 
         if self.out_order == "bct":
             for i in range(len(outs)):
@@ -278,6 +284,9 @@ class SelfAttnTDM(nn.Module):
 
         # for i, out in enumerate(outs):
         #     print(i, out.shape)
+
+        if len(outs) == 1:
+            outs = outs[0]
 
         return tuple(outs)
 

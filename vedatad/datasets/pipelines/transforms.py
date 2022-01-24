@@ -8,7 +8,7 @@ from vedacore.misc import registry
 from vedatad.misc.segment import segment_overlaps
 
 
-@registry.register_module('pipeline')
+@registry.register_module("pipeline")
 class SpatialRandomFlip(object):
     """Spatially flip images.
 
@@ -22,12 +22,12 @@ class SpatialRandomFlip(object):
             'horizontal' and 'vertical'. Default: 'horizontal'.
     """
 
-    def __init__(self, flip_ratio=None, direction='horizontal'):
+    def __init__(self, flip_ratio=None, direction="horizontal"):
         self.flip_ratio = flip_ratio
         self.direction = direction
         if flip_ratio is not None:
             assert 0 <= flip_ratio <= 1
-        assert direction in ['horizontal', 'vertical']
+        assert direction in ["horizontal", "vertical"]
 
     def __call__(self, results):
         """Call function to flip images.
@@ -41,8 +41,8 @@ class SpatialRandomFlip(object):
         """
 
         if np.random.rand() < self.flip_ratio:
-            for key in results.get('img_fields', ['imgs']):
-                if self.direction == 'horizontal':
+            for key in results.get("img_fields", ["imgs"]):
+                if self.direction == "horizontal":
                     results[key] = np.flip(results[key], axis=2)
                 else:
                     results[key] = np.flip(results[key], axis=1)
@@ -50,10 +50,10 @@ class SpatialRandomFlip(object):
         return results
 
     def __repr__(self):
-        return self.__class__.__name__ + f'(flip_ratio={self.flip_ratio})'
+        return self.__class__.__name__ + f"(flip_ratio={self.flip_ratio})"
 
 
-@registry.register_module('pipeline')
+@registry.register_module("pipeline")
 class Pad(object):
     """Pad images.
 
@@ -77,15 +77,17 @@ class Pad(object):
 
     def _pad_imgs(self, results):
         """Pad images according to ``self.size``."""
-        for key in results.get('img_fields', ['imgs']):
+        for key in results.get("img_fields", ["imgs"]):
             if self.size is not None:
                 padded_imgs = image.impad(
-                    results[key], shape=self.size, pad_val=self.pad_val)
+                    results[key], shape=self.size, pad_val=self.pad_val
+                )
             elif self.size_divisor is not None:
                 padded_imgs = image.impad_to_multiple(
-                    results[key], self.size_divisor, pad_val=self.pad_val)
+                    results[key], self.size_divisor, pad_val=self.pad_val
+                )
             results[key] = padded_imgs
-        results['pad_tsize'] = padded_imgs.shape[0]
+        results["pad_tsize"] = padded_imgs.shape[0]
 
     def __call__(self, results):
         """Call function to pad images.
@@ -101,13 +103,13 @@ class Pad(object):
 
     def __repr__(self):
         repr_str = self.__class__.__name__
-        repr_str += f'(size={self.size}, '
-        repr_str += f'size_divisor={self.size_divisor}, '
-        repr_str += f'pad_val={self.pad_val})'
+        repr_str += f"(size={self.size}, "
+        repr_str += f"size_divisor={self.size_divisor}, "
+        repr_str += f"pad_val={self.pad_val})"
         return repr_str
 
 
-@registry.register_module('pipeline')
+@registry.register_module("pipeline")
 class Normalize(object):
     """Normalize images.
 
@@ -135,20 +137,20 @@ class Normalize(object):
             dict: Normalized results, 'img_norm_cfg' key is added into
                 result dict.
         """
-        for key in results.get('img_fields', ['imgs']):
-            results[key] = image.imnormalize(results[key], self.mean, self.std,
-                                             self.to_rgb)
-        results['img_norm_cfg'] = dict(
-            mean=self.mean, std=self.std, to_rgb=self.to_rgb)
+        for key in results.get("img_fields", ["imgs"]):
+            results[key] = image.imnormalize(
+                results[key], self.mean, self.std, self.to_rgb
+            )
+        results["img_norm_cfg"] = dict(mean=self.mean, std=self.std, to_rgb=self.to_rgb)
         return results
 
     def __repr__(self):
         repr_str = self.__class__.__name__
-        repr_str += f'(mean={self.mean}, std={self.std}, to_rgb={self.to_rgb})'
+        repr_str += f"(mean={self.mean}, std={self.std}, to_rgb={self.to_rgb})"
         return repr_str
 
 
-@registry.register_module('pipeline')
+@registry.register_module("pipeline")
 class SpatialRandomCrop(object):
     """Spatially random crop images.
 
@@ -174,7 +176,7 @@ class SpatialRandomCrop(object):
                 is updated according to crop size.
         """
 
-        for key in results.get('img_fields', ['imgs']):
+        for key in results.get("img_fields", ["imgs"]):
             imgs = results[key]
             margin_h = max(imgs.shape[1] - self.crop_size[0], 0)
             margin_w = max(imgs.shape[2] - self.crop_size[1], 0)
@@ -190,10 +192,10 @@ class SpatialRandomCrop(object):
         return results
 
     def __repr__(self):
-        return self.__class__.__name__ + f'(crop_size={self.crop_size})'
+        return self.__class__.__name__ + f"(crop_size={self.crop_size})"
 
 
-@registry.register_module('pipeline')
+@registry.register_module("pipeline")
 class SpatialCenterCrop(object):
     """Spatially center crop images.
 
@@ -219,7 +221,7 @@ class SpatialCenterCrop(object):
                 is updated according to crop size.
         """
 
-        for key in results.get('img_fields', ['imgs']):
+        for key in results.get("img_fields", ["imgs"]):
             imgs = results[key]
             margin_h = max(imgs.shape[1] - self.crop_size[0], 0)
             margin_w = max(imgs.shape[2] - self.crop_size[1], 0)
@@ -235,10 +237,10 @@ class SpatialCenterCrop(object):
         return results
 
     def __repr__(self):
-        return self.__class__.__name__ + f'(crop_size={self.crop_size})'
+        return self.__class__.__name__ + f"(crop_size={self.crop_size})"
 
 
-@registry.register_module('pipeline')
+@registry.register_module("pipeline")
 class PhotoMetricDistortion(object):
     """Apply photometric distortion to images sequentially, every
     transformation is applied with a probability of 0.5. The position of random
@@ -260,12 +262,14 @@ class PhotoMetricDistortion(object):
         hue_delta (int): delta of hue.
     """
 
-    def __init__(self,
-                 brightness_delta=32,
-                 contrast_range=(0.5, 1.5),
-                 saturation_range=(0.5, 1.5),
-                 hue_delta=18,
-                 p=0.5):
+    def __init__(
+        self,
+        brightness_delta=32,
+        contrast_range=(0.5, 1.5),
+        saturation_range=(0.5, 1.5),
+        hue_delta=18,
+        p=0.5,
+    ):
         self.brightness_delta = brightness_delta
         self.contrast_lower, self.contrast_upper = contrast_range
         self.saturation_lower, self.saturation_upper = saturation_range
@@ -282,14 +286,15 @@ class PhotoMetricDistortion(object):
             dict: Result dict with images distorted.
         """
 
-        if 'img_fields' in results:
-            assert results['img_fields'] == [
-                'imgs'
-            ], ('Only single img_fields is allowed')
-        imgs = results['imgs']
+        if "img_fields" in results:
+            assert results["img_fields"] == [
+                "imgs"
+            ], "Only single img_fields is allowed"
+        imgs = results["imgs"]
         assert imgs.dtype == np.float32, (
-            'PhotoMetricDistortion needs the input imgs of dtype np.float32'
-            ', please set "to_float32=True" in "LoadFrames" pipeline')
+            "PhotoMetricDistortion needs the input imgs of dtype np.float32"
+            ', please set "to_float32=True" in "LoadFrames" pipeline'
+        )
 
         def _filter(img):
             img[img < 0] = 0
@@ -300,8 +305,7 @@ class PhotoMetricDistortion(object):
 
             # random brightness
             if random.randint(2):
-                delta = random.uniform(-self.brightness_delta,
-                                       self.brightness_delta)
+                delta = random.uniform(-self.brightness_delta, self.brightness_delta)
                 imgs += delta
                 imgs = _filter(imgs)
 
@@ -310,8 +314,7 @@ class PhotoMetricDistortion(object):
             mode = random.randint(2)
             if mode == 1:
                 if random.randint(2):
-                    alpha = random.uniform(self.contrast_lower,
-                                           self.contrast_upper)
+                    alpha = random.uniform(self.contrast_lower, self.contrast_upper)
                     imgs *= alpha
                     imgs = _filter(imgs)
 
@@ -320,8 +323,9 @@ class PhotoMetricDistortion(object):
 
             # random saturation
             if random.randint(2):
-                imgs[..., 1] *= random.uniform(self.saturation_lower,
-                                               self.saturation_upper)
+                imgs[..., 1] *= random.uniform(
+                    self.saturation_lower, self.saturation_upper
+                )
 
             # random hue
             # if random.randint(2):
@@ -337,8 +341,7 @@ class PhotoMetricDistortion(object):
             # random contrast
             if mode == 0:
                 if random.randint(2):
-                    alpha = random.uniform(self.contrast_lower,
-                                           self.contrast_upper)
+                    alpha = random.uniform(self.contrast_lower, self.contrast_upper)
                     imgs *= alpha
                     imgs = _filter(imgs)
 
@@ -346,21 +349,21 @@ class PhotoMetricDistortion(object):
             if random.randint(2):
                 imgs = imgs[..., random.permutation(3)]
 
-            results['imgs'] = imgs
+            results["imgs"] = imgs
         return results
 
     def __repr__(self):
         repr_str = self.__class__.__name__
-        repr_str += f'(\nbrightness_delta={self.brightness_delta},\n'
-        repr_str += 'contrast_range='
-        repr_str += f'{(self.contrast_lower, self.contrast_upper)},\n'
-        repr_str += 'saturation_range='
-        repr_str += f'{(self.saturation_lower, self.saturation_upper)},\n'
-        repr_str += f'hue_delta={self.hue_delta})'
+        repr_str += f"(\nbrightness_delta={self.brightness_delta},\n"
+        repr_str += "contrast_range="
+        repr_str += f"{(self.contrast_lower, self.contrast_upper)},\n"
+        repr_str += "saturation_range="
+        repr_str += f"{(self.saturation_lower, self.saturation_upper)},\n"
+        repr_str += f"hue_delta={self.hue_delta})"
         return repr_str
 
 
-@registry.register_module('pipeline')
+@registry.register_module("pipeline")
 class TemporalRandomCrop(object):
     """Temporally crop.
 
@@ -373,11 +376,12 @@ class TemporalRandomCrop(object):
         self.num_frames = num_frames
         self.iof_th = iof_th
         self.segment2label = dict(
-            gt_segments='gt_labels', gt_segments_ignore='gt_labels_ignore')
+            gt_segments="gt_labels", gt_segments_ignore="gt_labels_ignore"
+        )
 
     def get_valid_mask(self, segments, patch, iof_th):
-        gt_iofs = segment_overlaps(segments, patch, mode='iof')[:, 0]
-        patch_iofs = segment_overlaps(patch, segments, mode='iof')[0, :]
+        gt_iofs = segment_overlaps(segments, patch, mode="iof")[:, 0]
+        patch_iofs = segment_overlaps(patch, segments, mode="iof")[0, :]
         iofs = np.maximum(gt_iofs, patch_iofs)
         mask = iofs > iof_th
 
@@ -394,19 +398,24 @@ class TemporalRandomCrop(object):
                 result dict.
         """
 
-        total_frames = results['tsize']
+        total_frames = results["tsize"]
         patch_num_frames = min(self.num_frames, total_frames)
+        count = 0
         while True:
+            count += 1
+
+
             start = np.random.randint(0, total_frames - patch_num_frames + 1)
             end = start + patch_num_frames
             patch = np.array([[start, end]], dtype=np.float32)
 
-            mask = self.get_valid_mask(results['gt_segments'], patch,
-                                       self.iof_th)
-            if np.count_nonzero(mask) == 0:
+            mask = self.get_valid_mask(results["gt_segments"], patch, self.iof_th)
+            if count < 20 and np.count_nonzero(mask) == 0:
                 continue
+            elif count >= 20:
+                print(results["video_info"], results["ann_info"], results["gt_segments"])
 
-            for key in results.get('segment_fields', []):
+            for key in results.get("segment_fields", []):
                 segments = results[key]
                 mask = self.get_valid_mask(segments, patch, self.iof_th)
                 segments = segments[mask]
@@ -418,21 +427,21 @@ class TemporalRandomCrop(object):
                 label_key = self.segment2label[key]
                 if label_key in results:
                     results[label_key] = results[label_key][mask]
-            results['img_ids'] = results['img_ids'][start:end]
-            results['tsize'] = end - start
-            results['tshift'] = start
+            results["img_ids"] = results["img_ids"][start:end]
+            results["tsize"] = end - start
+            results["tshift"] = start
 
             return results
 
     def __repr__(self):
         repr_str = self.__class__.__name__
-        repr_str += f'(num_frames={self.num_frames},'
-        repr_str += f'iof_th={self.iof_th})'
+        repr_str += f"(num_frames={self.num_frames},"
+        repr_str += f"iof_th={self.iof_th})"
 
         return repr_str
 
 
-@registry.register_module('pipeline')
+@registry.register_module("pipeline")
 class Rotate(object):
     """Spatially rotate images.
 
@@ -447,12 +456,14 @@ class Rotate(object):
         border_value (int): Border value. Default: 0
     """
 
-    def __init__(self,
-                 limit,
-                 interpolation='bilinear',
-                 border_mode='constant',
-                 border_value=0,
-                 p=0.5):
+    def __init__(
+        self,
+        limit,
+        interpolation="bilinear",
+        border_mode="constant",
+        border_value=0,
+        p=0.5,
+    ):
         if isinstance(limit, int):
             limit = (-limit, limit)
         self.limit = limit
@@ -473,14 +484,16 @@ class Rotate(object):
 
         if random.uniform(0, 1) <= self.p:
             angle = random.uniform(*self.limit)
-            for key in results.get('img_fields', ['imgs']):
+            for key in results.get("img_fields", ["imgs"]):
                 imgs = [
                     image.imrotate(
                         img,
                         angle=angle,
                         interpolation=self.interpolation,
                         border_mode=self.border_mode,
-                        border_value=self.border_value) for img in results[key]
+                        border_value=self.border_value,
+                    )
+                    for img in results[key]
                 ]
                 results[key] = np.array(imgs)
 
@@ -488,22 +501,23 @@ class Rotate(object):
 
     def __repr__(self):
         repr_str = self.__class__.__name__
-        repr_str += f'(limit={self.limit},'
-        repr_str += f'interpolation={self.interpolation},'
-        repr_str += f'border_mode={self.border_mode},'
-        repr_str += f'border_value={self.border_value},'
-        repr_str += f'p={self.p})'
+        repr_str += f"(limit={self.limit},"
+        repr_str += f"interpolation={self.interpolation},"
+        repr_str += f"border_mode={self.border_mode},"
+        repr_str += f"border_value={self.border_value},"
+        repr_str += f"p={self.p})"
 
         return repr_str
 
 
-@registry.register_module('pipeline')
+@registry.register_module("pipeline")
 class TemporalCrop(object):
     """Temporally crop."""
 
     def __init__(self):
         self.segment2label = dict(
-            gt_segments='gt_labels', gt_segments_ignore='gt_labels_ignore')
+            gt_segments="gt_labels", gt_segments_ignore="gt_labels_ignore"
+        )
 
     def __call__(self, results):
         """Call function to temporally crop video frame.
@@ -516,11 +530,11 @@ class TemporalCrop(object):
                 updated in result dict.
         """
 
-        start, end = results['patch']
+        start, end = results["patch"]
         patch = np.array([start, end], dtype=np.float32)
-        for key in results.get('segment_fields', []):
+        for key in results.get("segment_fields", []):
             segments = results[key]
-            iofs = segment_overlaps(segments, patch[None, :], mode='iof')[:, 0]
+            iofs = segment_overlaps(segments, patch[None, :], mode="iof")[:, 0]
             mask = iofs > 0
             segments = segments[mask]
             segments[:, 0] = segments[:, 0].clip(min=start)
@@ -533,8 +547,8 @@ class TemporalCrop(object):
                 labels = results[label_key]
                 labels = labels[mask]
                 results[label_key] = labels
-        results['img_ids'] = results['img_ids'][start:end]
-        results['tsize'] = end - start
-        results['tshift'] = start
+        results["img_ids"] = results["img_ids"][start:end]
+        results["tsize"] = end - start
+        results["tshift"] = start
 
         return results

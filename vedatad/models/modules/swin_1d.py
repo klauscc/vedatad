@@ -1,8 +1,8 @@
 import copy
-from torch import nn
-import torch
 
+import torch
 from timm.models.layers import DropPath, trunc_normal_
+from torch import nn
 
 
 class Mlp(nn.Module):
@@ -91,7 +91,7 @@ class WindowAttention1D(nn.Module):
         trunc_normal_(self.relative_position_bias_table, std=0.02)
         self.softmax = nn.Softmax(dim=-1)
 
-    def forward(self, x, mask=None):
+    def forward(self, x, mask: torch.Tensor = None):
         """Forward function.
         Args:
             x: input features with shape of (num_windows*B, N, C)
@@ -119,12 +119,17 @@ class WindowAttention1D(nn.Module):
         attn = attn + relative_position_bias.unsqueeze(0)  # B_, nH, N, N
 
         if mask is not None:
-            nW = mask.shape[0]
-            attn = attn.view(B_ // nW, nW, self.num_heads, N, N) + mask.unsqueeze(
-                1
-            ).unsqueeze(0)
-            attn = attn.view(-1, self.num_heads, N, N)
-            attn = self.softmax(attn)
+            if mask.ndim == 2:  # [N,N]
+                mask = mask.unsqueeze(0).unsqueeze(0)  # 1,1,N,N
+                attn = attn + mask
+                attn = self.softmax(attn)
+            else:  # [nW,N,N]
+                nW = mask.shape[0]
+                attn = attn.view(B_ // nW, nW, self.num_heads, N, N) + mask.unsqueeze(
+                    1
+                ).unsqueeze(0)
+                attn = attn.view(-1, self.num_heads, N, N)
+                attn = self.softmax(attn)
         else:
             attn = self.softmax(attn)
 
@@ -181,11 +186,12 @@ class EncoderLayer1D(nn.Module):
             drop=drop,
         )
 
-    def forward(self, x: torch.Tensor):
+    def forward(self, x: torch.Tensor, mask: torch.Tensor = None):
         """forward function
 
         Args:
             x (torch.Tensor): input with shape [B,D,C]
+            mask (torch.Tensor): attention mask. shape [D,D].
 
         Returns: torch.Tensor. The same shape as input [B,D,C]
 
@@ -193,7 +199,7 @@ class EncoderLayer1D(nn.Module):
         shortcut = x
         # attn
         x = self.norm1(x)
-        x = self.attn(x)
+        x = self.attn(x, mask)
         x = shortcut + self.drop_path(x)
         # mlp
         x = x + self.drop_path(self.mlp(self.norm2(x)))
@@ -219,7 +225,7 @@ class Encoder(nn.Module):
             [copy.deepcopy(encoder_layer) for i in range(num_layers)]
         )
 
-    def forward(self, x: torch.Tensor):
+    def forward(self, x: torch.Tensor, mask: torch.Tensor = None):
         """forward function
 
         Args:
@@ -229,7 +235,7 @@ class Encoder(nn.Module):
 
         """
         for mod in self.layers:
-            x = mod(x)
+            x = mod(x, mask)
         return x
 
 
@@ -274,6 +280,7 @@ def dot_product_attention(
     C = nH * head_dim
     x = (attn @ v).transpose(1, 2).reshape(B_, Nq, C)
     return x
+
 
 class CrossAttention1D(nn.Module):
 
@@ -372,5 +379,3 @@ class CrossAttention1D(nn.Module):
         x = self.proj(x)
         x = self.proj_drop(x)
         return x
-
-        

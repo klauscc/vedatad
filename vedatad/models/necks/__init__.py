@@ -1,4 +1,4 @@
-from .fpn import FPN
+from .fpn import FPN, SelfAttnFPN
 from .srm import SRM
 from .srm_vswin import SRMSwin, SRMSwinNorm
 from .tdm import TDM, MultiScaleTDM, SelfAttnTDM
@@ -8,6 +8,7 @@ from .multi_scale import ReshapeFeatures, MultiScaleWrapper
 
 __all__ = [
     "FPN",
+    "SelfAttnFPN",
     "TDM",
     "MultiScaleTDM",
     "SelfAttnTDM",

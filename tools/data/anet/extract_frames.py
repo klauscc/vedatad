@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 
-import os
-import multiprocessing as mp
 import argparse
+import glob
+import multiprocessing as mp
+import os
+
 import cv2
 
 parser = argparse.ArgumentParser()
@@ -33,6 +35,9 @@ def extract(file):
     target_file = os.path.join(output_dir, file_name)
     os.makedirs(target_file, exist_ok=True)
 
+    num_files = glob.glob(os.path.join(target_file, "*"))
+    if len(num_files) >= args.max_frame // 3:
+        return
     cap = cv2.VideoCapture(os.path.join(video_dir, file))
     max_fps = cap.get(cv2.CAP_PROP_FPS)
     frame_num = cap.get(cv2.CAP_PROP_FRAME_COUNT)

@@ -845,3 +845,168 @@ for epoch in 600 700 800 900 500 1000 1100 400 300 1200 ; do
     python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
         --out $workdir/results_e$epoch-chunk.pkl
 done
+
+# 8.b.ii
+mkdir -p data/tmp/thumos14/memory_mechanism/8.b.ii
+cp -r data/thumos14/memory_mechanism/feat_swint_15fps_128x128_crop112x112 data/tmp/thumos14/memory_mechanism/8.b.ii/
+workdir=workdir/8.b.ii
+config=configs/trainval/daotad/8.b.ii.py
+tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+# Testing chunk
+workdir=workdir/8.b.ii
+config=configs/trainval/daotad/8.b.ii.py
+# epoch=900
+for epoch in 600 700 800 900 500 1000 1100 400 300 1200 ; do
+    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+        --out $workdir/results_e$epoch-chunk.pkl
+done
+
+# 8.b.iii
+mkdir -p data/tmp/thumos14/memory_mechanism/8.b.iii
+cp -r data/thumos14/memory_mechanism/feat_swint_15fps_128x128_crop112x112 data/tmp/thumos14/memory_mechanism/8.b.iii/
+workdir=workdir/8.b.iii
+config=configs/trainval/daotad/8.b.iii.py
+tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+# Testing chunk
+workdir=workdir/8.b.iii
+config=configs/trainval/daotad/8.b.iii.py
+# epoch=900
+for epoch in 600 700 800 900 500 1000 1100 400 300 1200 ; do
+    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+        --out $workdir/results_e$epoch-chunk.pkl
+done
+
+# 8.b.iv
+mkdir -p data/tmp/thumos14/memory_mechanism/8.b.iv
+cp -r data/thumos14/memory_mechanism/feat_swint_15fps_128x128_crop112x112 data/tmp/thumos14/memory_mechanism/8.b.iv/
+workdir=workdir/8.b.iv
+config=configs/trainval/daotad/8.b.iv.py
+tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+# Testing chunk
+workdir=workdir/8.b.iv
+config=configs/trainval/daotad/8.b.iv.py
+# epoch=900
+for epoch in 600 700 800 900 500 1000 1100 400 300 1200 ; do
+    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+        --out $workdir/results_e$epoch-chunk.pkl
+done
+
+# 8.c.i
+mkdir -p data/tmp/thumos14/memory_mechanism/8.c.i
+cp -r data/thumos14/memory_mechanism/feat_swint_15fps_128x128_crop112x112 data/tmp/thumos14/memory_mechanism/8.c.i/
+workdir=workdir/8.c.i
+config=configs/trainval/daotad/8.c.i.py
+tools/dist_trainval.sh $config "4,5,6,7" --workdir $workdir
+# Testing chunk
+workdir=workdir/8.c.i
+config=configs/trainval/daotad/8.c.i.py
+# epoch=900
+for epoch in 600 700 800 900 500 1000 1100 400 300 1200 ; do
+    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+        --out $workdir/results_e$epoch-chunk.pkl
+done
+
+# 8.c.ii
+mkdir -p data/tmp/thumos14/memory_mechanism/8.c.ii
+cp -r data/thumos14/memory_mechanism/feat_swint_15fps_128x128_crop112x112 data/tmp/thumos14/memory_mechanism/8.c.ii/
+workdir=workdir/8.c.ii
+config=configs/trainval/daotad/8.c.ii.py
+tools/dist_trainval.sh $config "4,5,6,7" --workdir $workdir
+# Testing chunk
+workdir=workdir/8.c.ii
+config=configs/trainval/daotad/8.c.ii.py
+# epoch=900
+for epoch in 600 700 800 900 500 1000 1100 400 300 1200 ; do
+    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+        --out $workdir/results_e$epoch-chunk.pkl
+done
+
+# 8.c.iii
+mkdir -p data/tmp/thumos14/memory_mechanism/8.c.iii
+cp -r data/thumos14/memory_mechanism/feat_swint_15fps_128x128_crop112x112 data/tmp/thumos14/memory_mechanism/8.c.iii/
+workdir=workdir/8.c.iii
+config=configs/trainval/daotad/8.c.iii.py
+tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+# Testing chunk
+workdir=workdir/8.c.iii
+config=configs/trainval/daotad/8.c.iii.py
+# epoch=900
+for epoch in 600 700 800 900 500 1000 1100 400 300 1200 ; do
+    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+        --out $workdir/results_e$epoch-chunk.pkl
+done
+
+# 8.c.iv
+mkdir -p data/tmp/thumos14/memory_mechanism/8.c.iv
+cp -r data/thumos14/memory_mechanism/feat_swint_15fps_128x128_crop112x112 data/tmp/thumos14/memory_mechanism/8.c.iv/
+workdir=workdir/8.c.iv
+config=configs/trainval/daotad/8.c.iv.py
+tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+# Testing chunk
+workdir=workdir/8.c.iv
+config=configs/trainval/daotad/8.c.iv.py
+# epoch=900
+for epoch in 600 700 800 900 500 1000 1100 400 300 1200 ; do
+    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+        --out $workdir/results_e$epoch-chunk.pkl
+done
+
+# 8.e.i
+mkdir -p data/tmp/thumos14/memory_mechanism/8.e.i
+cp -r data/thumos14/memory_mechanism/feat_swint_15fps_128x128_crop112x112 data/tmp/thumos14/memory_mechanism/8.e.i/
+workdir=workdir/8.e.i
+config=configs/trainval/daotad/8.e.i.py
+tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+# Testing chunk
+workdir=workdir/8.e.i
+config=configs/trainval/daotad/8.e.i.py
+# epoch=900
+for epoch in 600 700 800 900 500 1000 1100 400 300 1200 ; do
+    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+        --out $workdir/results_e$epoch-chunk.pkl
+done
+
+# 8.e.ii
+mkdir -p data/tmp/thumos14/memory_mechanism/8.e.ii
+cp -r data/thumos14/memory_mechanism/feat_swint_15fps_128x128_crop112x112 data/tmp/thumos14/memory_mechanism/8.e.ii/
+workdir=workdir/8.e.ii
+config=configs/trainval/daotad/8.e.ii.py
+tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+# Testing chunk
+workdir=workdir/8.e.ii
+config=configs/trainval/daotad/8.e.ii.py
+# epoch=900
+for epoch in 600 700 800 900 500 1000 1100 400 300 1200 ; do
+    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+        --out $workdir/results_e$epoch-chunk.pkl
+done
+
+# 8.f.i
+mkdir -p data/tmp/thumos14/memory_mechanism/8.f.i
+cp -r data/thumos14/memory_mechanism/feat_swint_15fps_128x128_crop112x112 data/tmp/thumos14/memory_mechanism/8.f.i/
+workdir=workdir/8.f.i
+config=configs/trainval/daotad/8.f.i.py
+tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+# Testing chunk
+workdir=workdir/8.f.i
+config=configs/trainval/daotad/8.f.i.py
+# epoch=900
+for epoch in 600 700 800 900 500 1000 1100 400 300 1200 ; do
+    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+        --out $workdir/results_e$epoch-chunk.pkl
+done
+
+# 8.f.ii
+mkdir -p data/tmp/thumos14/memory_mechanism/8.f.ii
+cp -r data/thumos14/memory_mechanism/feat_swint_15fps_128x128_crop112x112 data/tmp/thumos14/memory_mechanism/8.f.ii/
+workdir=workdir/8.f.ii
+config=configs/trainval/daotad/8.f.ii.py
+tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+# Testing chunk
+workdir=workdir/8.f.ii
+config=configs/trainval/daotad/8.f.ii.py
+# epoch=900
+for epoch in 600 700 800 900 500 1000 1100 400 300 1200 ; do
+    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+        --out $workdir/results_e$epoch-chunk.pkl
+done

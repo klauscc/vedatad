@@ -1,21 +1,19 @@
 #!/usr/bin/env python
 
 import math
+
 import torch
 import torch.nn as nn
+from einops.einops import rearrange
 
-from vedacore.modules.bricks.conv_module import ConvModule
-from vedatad.models.modules.positional_encoding import (
-    AbsPosEmbedding,
-    PositionalEncoding,
-)
-from vedatad.models.modules.transformer import (
-    TransformerDecoder,
-    TransformerDecoderLayer,
-)
-
-from ..builder import build_neck
 from vedacore.misc import registry
+from vedacore.modules.bricks.conv_module import ConvModule
+from vedatad.models.modules.masking import biband_mask, q_k_relation_mask
+from vedatad.models.modules.positional_encoding import (AbsPosEmbedding,
+                                                        PositionalEncoding)
+from vedatad.models.modules.transformer import (TransformerDecoder,
+                                                TransformerDecoderLayer)
+from ..builder import build_neck
 
 
 @registry.register_module("neck")
@@ -53,6 +51,10 @@ class AttnFPN(nn.Module):
         out_channels,
         num_layers,
         neck_module_cfg,
+        inp_add_pe=False,
+        fpn_feat_kernel_size: int = None,
+        only_attend_to_self=False,
+        attention_mask_expand=0,
         norm_cfg: dict = None,
     ):
         """TODO: to be defined.
@@ -61,7 +63,10 @@ class AttnFPN(nn.Module):
             in_channels (int): The input channels.
             out_channels (int): The out_channels of FPN.
             neck_module_cfg (list or dict): The neck module config.
-                Default to
+                Default to None.
+            fpn_feat_kernel_size (int): The kernel size for the FPN self-attention.
+            only_attend_to_self (bool): Wehther the fpn features only attend to the corresponding high_res_feat.
+            attention_mask_expand (float): The ratio to attend outside the corresponding areas.
             conv_norm (dict): The norm for the convolution that project backbone feature to the key/value of the cross-attention.
 
         """
@@ -69,6 +74,9 @@ class AttnFPN(nn.Module):
 
         self.out_channels = out_channels
         self.neck_module_cfg = neck_module_cfg
+        self.fpn_feat_kernel_size = fpn_feat_kernel_size
+        self.only_attend_to_self = only_attend_to_self
+        self.attention_mask_expand = attention_mask_expand
 
         self.neck = build_neck(neck_module_cfg)
 
@@ -80,6 +88,10 @@ class AttnFPN(nn.Module):
             norm_cfg=norm_cfg,
             act_cfg=dict(typename="ReLU"),
         )
+
+        self.inp_add_pe = inp_add_pe
+        if inp_add_pe:
+            self.inp_pe = PositionalEncoding(in_channels, scale_pe=True)
 
         self.pe = PositionalEncoding(out_channels, scale_pe=True)
 
@@ -104,13 +116,30 @@ class AttnFPN(nn.Module):
         Returns: tuple. The FPN features. Each element is a tensor of shape (B, C', T'). T' is different for different levels.
 
         """
+        if self.inp_add_pe:
+            x = rearrange(x, "b c t -> t b c")
+            x = self.inp_pe(x)
+            x = rearrange(x, "t b c -> b c t")
         pyramid_features = self.neck(x)
         high_res_feat = self.conv(x).permute(2, 0, 1)  # shape: [T1,B,C]
         outs = []
         for f in pyramid_features:  # shape: [B,C,T]
             f = f.permute(2, 0, 1)  # shape: [T,B,C]
             f = self.pe(f)
-            f = self.trans_decoder(f, high_res_feat)
+
+            f_mask = biband_mask(f.shape[0], self.fpn_feat_kernel_size, f.device)
+            if self.only_attend_to_self:
+                mem_mask = q_k_relation_mask(
+                    f.shape[0],
+                    high_res_feat.shape[0],
+                    f.device,
+                    expand=self.attention_mask_expand,
+                )
+            else:
+                mem_mask = None
+            f = self.trans_decoder(
+                f, high_res_feat, tgt_mask=f_mask, memory_mask=mem_mask
+            )
             f = f.permute(1, 2, 0)  # shape: [B,C,T]
             outs.append(f)
         return outs
