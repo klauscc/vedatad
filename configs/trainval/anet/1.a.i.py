@@ -222,7 +222,10 @@ val_engine = dict(
     ),
     num_classes=num_classes,
     test_cfg=dict(
-        score_thr=0.005, nms=dict(typename="nmw", iou_thr=0.5), max_per_video=1200
+        # score_thr=0.005, nms=dict(typename="nmw", iou_thr=0.5), max_per_video=1200
+        score_thr=0.005,
+        nms=dict(typename="nmw", iou_thr=0.85),
+        max_per_video=100,
     ),
     use_sigmoid=use_sigmoid,
 )

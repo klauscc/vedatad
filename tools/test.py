@@ -75,6 +75,7 @@ def main():
 
     engine, data_loader = prepare(cfg, args.checkpoint)
 
+    print(f"Evaluate checkpoint: {args.checkpoint}")
     if not os.path.isfile(args.out):
         results = test(engine, data_loader)
         print(f"\nwriting results to {args.out}")
