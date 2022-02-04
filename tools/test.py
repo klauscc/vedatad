@@ -1,4 +1,5 @@
 import argparse
+import json
 import os
 
 import numpy as np
@@ -90,6 +91,34 @@ def main():
         iou_thrs = np.arange(0.5, 1.0, 0.05)
     else:
         raise ValueError(f"dataset {args.dataset} not supported")
+
+    ## filter results
+    if args.dataset == "anet":
+        data_infos = data_loader.dataset.data_infos
+        cuhk_data = json.load(open("cuhk-val/cuhk_val_simp_share.json", "r"))
+        cuhk_data_score = cuhk_data["results"]
+        cuhk_data_action = cuhk_data["class"]
+        filtered_results = []
+
+        cls_idx_mapping = {}
+        for i, line in enumerate(open("data/annots/anet/class_name.txt", "r")):
+            class_name = line.rstrip()
+            cls_idx_mapping[class_name] = i
+
+        for idx, res in enumerate(results):
+            video_name = data_infos[idx]["video_name"]
+            cuhk_score = cuhk_data_score[video_name]
+            cls_idx = np.argmax(cuhk_score)
+            cls = cuhk_data_action[cls_idx]
+            cls_idx = cls_idx_mapping[cls]
+            filtered_res = []
+            for i in range(len(res)):
+                if i == cls_idx:
+                    filtered_res.append(res[i])
+                else:
+                    filtered_res.append(np.empty(shape=(0, 3), dtype=np.float32))
+            filtered_results.append(filtered_res)
+        results = filtered_results
 
     # kwargs = dict() if args.eval_options is None else args.eval_options
 

@@ -9,13 +9,15 @@
 
 
 from functools import lru_cache
-from vedatad.models.backbones.vswin import SwinTransformer3D
+
 import numpy as np
 import torch
 import torch.nn.functional as F
-from vedatad.models.builder import build_backbone
 from torch import nn
+
 from vedacore.misc import registry
+from vedatad.models.backbones.vswin import SwinTransformer3D
+from vedatad.models.builder import build_backbone
 
 
 class TemporalGradDrop(torch.autograd.Function):
@@ -88,6 +90,16 @@ def generate_indices(num_chunks, keep_ratio, mode="uniform"):
             .astype(np.int64)
             .tolist()
         )
+    elif mode == "uniform_jitter":
+        keep_indices = np.linspace(
+            0, num_chunks - 1, int(num_chunks * keep_ratio), endpoint=False
+        )
+        jitters = np.random.uniform(
+            0, (num_chunks - 1) / num_chunks / keep_ratio, size=len(keep_indices)
+        )
+        keep_indices = keep_indices + jitters
+        keep_indices = keep_indices.astype(np.int64)
+        keep_indices = np.clip(keep_indices, 0, num_chunks - 1).tolist()
     elif mode == "random":
         keep_indices = np.random.choice(
             np.arange(num_chunks), size=int(num_chunks * keep_ratio), replace=False

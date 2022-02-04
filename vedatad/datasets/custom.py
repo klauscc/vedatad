@@ -363,6 +363,17 @@ class CustomDataset(Dataset):
             self.format_results(results, jsonfile_prefix)
 
         annotations = [self.get_ann_info(i) for i in range(len(self))]
+
+        if False:
+            for anno, res in zip(annotations, results):
+                print("-----------------------------------")
+                print(f"label: {anno['labels']}")
+                print("anno:", anno, "\n") 
+                for i, pred in enumerate(res):
+                    if len(pred) > 0:
+                        print(f"{i}: {pred}")
+                print("-----------------------------------")
+
         eval_results = {}
         assert isinstance(iou_thr, float)
         mean_ap, _ = eval_map(
