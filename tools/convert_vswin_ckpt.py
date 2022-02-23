@@ -12,8 +12,8 @@ import os.path as osp
 import torch
 
 ckpt_dir = "data/pretrained_models/vswin"
-src_name = "swin_base_patch244_window877_kinetics400_22k.pth"
-dst_name = "swin_base_patch244_window877_kinetics400_22k_keysfrom_backbone.pth"
+src_name = "swin_base_patch244_window877_kinetics600_22k.pth"
+dst_name = "swin_base_patch244_window877_kinetics600_22k_keysfrom_backbone.pth"
 
 src_path = osp.join(ckpt_dir, src_name)
 dst_path = osp.join(ckpt_dir, dst_name)

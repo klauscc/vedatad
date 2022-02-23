@@ -107,9 +107,10 @@ class Thumos14Dataset(CustomDataset):
 class ANetDataset(CustomDataset):
     """ANet dataset for temporal action detection."""
 
-    def __init__(self, subset, **kwargs):
+    def __init__(self, subset, use_binary_class=False, **kwargs):
 
         self.subset = subset
+        self.use_binary_class = use_binary_class
         super(ANetDataset, self).__init__(**kwargs)
 
     def load_annotations(self, ann_file):
@@ -160,7 +161,10 @@ class ANetDataset(CustomDataset):
                     segments_ignore.append(segment)
                 elif label in self.CLASSES:
                     segments.append(segment)
-                    labels.append(self.CLASSES.index(label))
+                    if self.use_binary_class:
+                        labels.append(0) # 0 for action and 1 for background
+                    else:
+                        labels.append(self.CLASSES.index(label))
                 else:
                     continue
             if not segments:

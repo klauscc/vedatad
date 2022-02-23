@@ -47,11 +47,14 @@ def load_features(mem_bank_file, shape, chunk_ids, chunk_size, f_offset):
     feat_ids = get_feat_ids(chunk_ids, chunk_size, f_offset)
 
     num_features = len(fp)
-    if max(feat_ids) >= num_features:
+    if max(feat_ids) >= num_features or min(feat_ids) < 0:
         idx = feat_ids[feat_ids < num_features]
-        features = fp[idx.tolist()].copy()
-        pad = len(feat_ids) - len(idx)
-        features = np.pad(features, ((0, pad), (0, 0)))  # [N,C]
+        pad_r = len(feat_ids) - len(idx)
+        new_idx= idx[idx >= 0]
+        pad_l = len(idx) - len(new_idx)
+
+        features = fp[new_idx.tolist()].copy()
+        features = np.pad(features, ((pad_l, pad_r), (0, 0)))  # [N,C]
     else:
         features = fp[feat_ids.tolist()].copy()
     features = np.reshape(features, (len(chunk_ids), chunk_size, -1))
@@ -81,6 +84,8 @@ def write_features(features, mem_bank_file, shape, chunk_ids, chunk_size, f_offs
     features = features.transpose((0, 2, 1)).reshape((len(feat_ids), -1))
 
     ids = feat_ids[feat_ids < len(fp)]
-    fp[ids] = features[: len(ids)]
+    new_ids = ids[ids >= 0]
+    pad_l = len(ids) - len(new_ids)
+    fp[new_ids.tolist()] = features[pad_l:pad_l+len(new_ids)]
     if isinstance(mem_bank_file, str):
         fp.flush()

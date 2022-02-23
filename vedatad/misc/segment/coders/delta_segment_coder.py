@@ -156,6 +156,10 @@ def delta2segment(rois, deltas, means=(0., 0.), stds=(1., 1.), max_t=None):
     # Compute interval of each roi
     p_interval = (rois[:, 1] - rois[:, 0]).unsqueeze(1).expand_as(d_interval)
     # Use exp(network energy) to enlarge/shrink each roi
+
+    # clamp d_interval to avoid too large values
+    d_interval = d_interval.clamp(max=1.)
+
     g_interval = p_interval * d_interval.exp()
     # Use network energy to shift the center of each roi
     g_center = p_center + p_interval * d_center

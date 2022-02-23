@@ -112,11 +112,19 @@ def main():
             cls = cuhk_data_action[cls_idx]
             cls_idx = cls_idx_mapping[cls]
             filtered_res = []
-            for i in range(len(res)):
-                if i == cls_idx:
-                    filtered_res.append(res[i])
-                else:
-                    filtered_res.append(np.empty(shape=(0, 3), dtype=np.float32))
+            if not cfg.use_binary_class:
+                for i in range(len(res)):
+                    if i == cls_idx:
+                        filtered_res.append(res[i])
+                    else:
+                        filtered_res.append(np.empty(shape=(0, 3), dtype=np.float32))
+            else:
+                for i in range(cfg.num_classes):
+                    if i == cls_idx:
+                        filtered_res.append(res[0])
+                    else:
+                        filtered_res.append(np.empty(shape=(0, 3), dtype=np.float32))
+
             filtered_results.append(filtered_res)
         results = filtered_results
 

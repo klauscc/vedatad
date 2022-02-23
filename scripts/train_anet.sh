@@ -96,11 +96,25 @@ done
 # 1.d.i
 workdir=workdir/anet/1.d.i
 config=configs/trainval/anet/1.d.i.py
-tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+tools/dist_trainval.sh $config "4,5,6,7" --workdir $workdir
 # Testing chunk
 workdir=workdir/anet/1.d.i
 config=configs/trainval/anet/1.d.i.py
 # epoch=30
+for epoch in 10 15 20 25 30; do
+    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+        --dataset anet \
+        --out $workdir/results_e$epoch-chunk.pkl
+done
+
+# 1.e.i
+workdir=workdir/anet/1.e.i
+config=configs/trainval/anet/1.e.i.py
+tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+# Testing chunk
+workdir=workdir/anet/1.e.i
+config=configs/trainval/anet/1.e.i.py
+# epoch=15
 for epoch in 10 15 20 25 30; do
     python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
         --dataset anet \

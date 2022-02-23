@@ -192,11 +192,26 @@ class GradDropChunkVideoSwin(SwinTransformer3D):
 class GradDropChunkVideoSwinV2(SwinTransformer3D):
     """chunk-wise video swin with partial feedback."""
 
-    def __init__(self, keep_ratio, chunk_size, *args, bp_idx_mode="uniform", **kwargs):
+    def __init__(
+        self,
+        keep_ratio,
+        chunk_size,
+        *args,
+        bp_idx_mode="uniform",
+        forward_mode="batch",
+        shift_inp=False,
+        t_downsample=2,
+        **kwargs,
+    ):
         super(GradDropChunkVideoSwinV2, self).__init__(*args, **kwargs)
         self.chunk_size = chunk_size
         self.keep_ratio = keep_ratio
         self.bp_idx_mode = bp_idx_mode
+        self.forward_mode = forward_mode
+
+        # shift input so that the chunks are different at each iteration.
+        self.shift_inp = shift_inp
+        self.t_downsample = t_downsample
 
     def forward_fn(self, x: torch.Tensor):
         """forward function
@@ -229,7 +244,7 @@ class GradDropChunkVideoSwinV2(SwinTransformer3D):
             raise ValueError("not acceptted type.")
         return outs
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor):
         """forward
 
         Args:
@@ -240,8 +255,16 @@ class GradDropChunkVideoSwinV2(SwinTransformer3D):
         """
         B, C, D, H, W = x.shape
         chunk_size = self.chunk_size
+        keep_ratio = self.keep_ratio
         assert D % chunk_size == 0, "D mod chunk_size must be 0."
         num_chunks = D // chunk_size
+
+        if self.shift_inp and self.training:
+            pad_l = int(torch.randint(0, chunk_size, size=[]))
+            pad_r = chunk_size - pad_l
+            x = F.pad(x, pad=(0, 0, 0, 0, pad_l, pad_r, 0, 0, 0, 0))
+            keep_ratio = (num_chunks * keep_ratio) / (num_chunks + 1)
+            num_chunks = num_chunks + 1
 
         # transpose input
         x = x.reshape(B, C, num_chunks, chunk_size, H, W).permute(
@@ -268,16 +291,20 @@ class GradDropChunkVideoSwinV2(SwinTransformer3D):
         def split_forward():
             with torch.no_grad():
                 y_wo_grad = []
-                for idx in drop_indices:
-                    y_wo_grad.append(self.forward_fn(x[idx : idx + 1].contiguous()))
+                drop_indices_splited = [
+                    drop_indices[: len(drop_indices) // 2],
+                    drop_indices[len(drop_indices) // 2 :],
+                ]
+                for idx in drop_indices_splited:
+                    y_wo_grad.append(self.forward_fn(x[idx].contiguous()))
                 y_wo_grad = torch.cat(y_wo_grad, dim=0)
             y_w_grad = self.forward_fn(x[keep_indices].contiguous())
             return y_wo_grad, y_w_grad
 
-        forward_mode = "batch_forward"
-        if forward_mode == "batch_forward":
+        forward_mode = self.forward_mode
+        if forward_mode == "batch":
             y_wo_grad, y_w_grad = batch_forward()
-        elif forward_mode == "split_forward":
+        elif forward_mode == "split":
             y_wo_grad, y_w_grad = split_forward()
         else:
             raise ValueError(f"forward mode:{forward_mode} not supported")
@@ -290,6 +317,9 @@ class GradDropChunkVideoSwinV2(SwinTransformer3D):
             y[keep_indices] = y_w_grad
             y[drop_indices] = y_wo_grad
             y = y.permute(1, 2, 0, 3).reshape(B, C1, num_chunks * D1)
+            if self.shift_inp and self.training:
+                start = pad_l // self.t_downsample
+                y = y[:, :, start : start + (num_chunks - 1) * D1]
             return y
 
         if isinstance(y_w_grad, (list, tuple)):
