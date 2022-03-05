@@ -6,16 +6,18 @@
 #   description:
 #
 # ================================================================
-from glob import glob
-from inspect import findsource
 import json
 import os
-from vedatad.models.builder import build_backbone
-import torch
+from glob import glob
+from inspect import findsource
+
 import numpy as np
-from PIL import Image
-import torchvision.transforms.functional as tf
+import torch
 import torch.nn.functional as F
+import torchvision.transforms.functional as tf
+from PIL import Image
+
+from vedatad.models.builder import build_backbone
 
 swin_t_config = dict(
     typename="ChunkVideoSwin",
@@ -48,7 +50,7 @@ swin_b_config = dict(
 )
 
 ################CONFIGS##################
-split = "test"
+split = "val"
 
 ### swin_tiny, 15fps, 128x128
 video_dir = f"data/thumos14/frames_15fps/{split}"
@@ -60,6 +62,7 @@ FEAT_DIM = 768
 ckpt_path = "data/pretrained_models/vswin/swin_tiny_patch244_window877_kinetics400_1k_keysfrom_backbone.pth"
 ### end config
 
+
 ### swin_base, 15fps, 256x256
 video_dir = f"data/thumos14/frames_15fps_256x256/{split}"
 dst_dir = f"data/thumos14/memory_mechanism/feat_swinb_15fps_256x256_crop224x224/{split}"
@@ -68,6 +71,16 @@ model_config = swin_b_config
 IMG_SHAPE = (224, 224)
 FEAT_DIM = 1024
 ckpt_path = "data/pretrained_models/vswin/swin_base_patch244_window877_kinetics400_22k_keysfrom_backbone.pth"
+### end config
+
+### swin_tiny, 15fps, 256x256
+video_dir = f"data/thumos14/frames_15fps_256x256/{split}"
+dst_dir = f"data/thumos14/memory_mechanism/feat_swint_15fps_256x256_crop224x224/{split}"
+meta_file = f"data/thumos14/memory_mechanism/feat_swint_15fps_256x256_crop224x224/meta_{split}.json"
+model_config = swin_t_config
+IMG_SHAPE = (224, 224)
+FEAT_DIM = 768
+ckpt_path = "data/pretrained_models/vswin/swin_tiny_patch244_window877_kinetics400_1k_keysfrom_backbone.pth"
 ### end config
 
 
@@ -92,6 +105,7 @@ CHUNK_SIZE = 32
 IMG_MEAN = torch.tensor([123.675, 116.28, 103.53], device=device)
 IMG_STD = torch.tensor([58.395, 57.12, 57.375], device=device)
 ########################################
+
 
 def load_video(video_path):
     """load frames
