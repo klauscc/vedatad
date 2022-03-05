@@ -9,19 +9,25 @@
 
 
 import os
-from vedatad.models.backbones.vswin import SwinTransformer3D
+
 import torch
 import torch.nn.functional as F
+
 from vedacore.misc import registry
+from vedatad.models.backbones.vswin import SwinTransformer3D
 
 
 @registry.register_module("backbone")
 class ChunkVideoSwin(SwinTransformer3D):
     """extract feature chunk wise"""
 
-    def __init__(self, chunk_size, *args, do_pooling=False, **kwargs):
+    def __init__(
+        self, chunk_size, *args, do_pooling=False, forward_mode="batch", **kwargs
+    ):
         super(ChunkVideoSwin, self).__init__(*args, **kwargs)
         self.chunk_size = chunk_size
+
+        self.forward_mode = forward_mode
 
         self.pool = torch.nn.AdaptiveAvgPool3d([None, 1, 1]) if do_pooling else None
 
@@ -34,10 +40,26 @@ class ChunkVideoSwin(SwinTransformer3D):
                     2) batch-first. shape: (B, C, D, H, W). Returned feature is
                     batch-first.
         """
-        if x.dim() == 6:  # chunk first
-            return self.forward_chunk_inp_output(x)
-        elif x.dim() == 5:  # batch-first
-            return self.forward_nochunk_inp_output(x)
+
+        def forward_x(x):
+            if x.dim() == 6:  # chunk first
+                return self.forward_chunk_inp_output(x)
+            elif x.dim() == 5:  # batch-first
+                return self.forward_nochunk_inp_output(x)
+            else:
+                raise ValueError(f"dimension of x should be 5 or 6. Got: {x.shape}")
+
+        if self.forward_mode == "batch":
+            return forward_x(x)
+        elif self.forward_mode == "split":
+            l = x.shape[0]
+            if l == 1:
+                return forward_x(x)
+            x1 = x[: l // 2]
+            x2 = x[l // 2 :]
+            x1 = forward_x(x1)
+            x2 = forward_x(x2)
+            return torch.cat([x1, x2], dim=0)
 
     def forward_chunk_inp_output(self, x):
         """

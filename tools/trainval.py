@@ -55,6 +55,10 @@ def main():
     log_file = osp.join(cfg.workdir, f"{timestamp}.log")
     logger = get_root_logger(log_file=log_file, log_level=cfg.log_level)
 
+    fraction = cfg.get("gpu_mem_fraction",1.0)
+    if fraction != 1.0:
+        torch.cuda.set_per_process_memory_fraction(fraction)
+
     torch.autograd.set_detect_anomaly(True)
     trainval(cfg, distributed, logger)
 

@@ -18,7 +18,7 @@ python tools/test.py configs/trainval/daotad/daotad_vswin_t_e700_thumos14_rgb.py
 # Testing whole
 workdir=workdir/1.a.iii
 config=configs/trainval/daotad/1.a.iii.py
-for epoch in 900 800 700 1000 1100 1200; do
+for epoch in 400 500 600 900 800 700 1000 1100 1200; do
     echo Epoch: $epoch. Inferencing...
     python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
         --out $workdir/results_e$epoch-whole.pkl
@@ -33,21 +33,35 @@ COMMENT
 #CUDA_VISIBLE_DEVICES=0 python tools/test.py configs/trainval/daotad/daotad_vswin_t_e700_thumos14_rgb_224x224.py $workdir/epoch_${epoch}_weights.pth \
 #    --out $workdir/results_e$epoch.pkl
 
-## 1.c.ii
-#workdir=workdir/1.c.ii
-#epoch=700
-#config=configs/trainval/daotad/1.c.ii.py
-#tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
-#python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
-#    --out $workdir/results_e$epoch.pkl
+# 1.c.ii
+workdir=workdir/1.c.ii
+epoch=700
+config=configs/trainval/daotad/1.c.ii.py
+tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+    --out $workdir/results_e$epoch.pkl
 
-## 1.c.iii
-#workdir=workdir/1.c.iii
-#epoch=700
-#config=configs/trainval/daotad/1.c.iii.py
-#tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
-#python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
-#    --out $workdir/results_e$epoch.pkl
+# 1.c.iii
+workdir=workdir/1.c.iii
+epoch=700
+config=configs/trainval/daotad/1.c.iii.py
+tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+    --out $workdir/results_e$epoch.pkl
+workdir=workdir/1.c.iii
+config=configs/trainval/daotad/1.c.iii.py
+for epoch in  600 700 800 900 400 500 1000 1100 1200; do
+    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+        --out $workdir/results_e$epoch-chunk.pkl
+done
+
+# 1.c.iv
+workdir=workdir/1.c.iv
+epoch=700
+config=configs/trainval/daotad/1.c.iv.py
+tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+    --out $workdir/results_e$epoch.pkl
 
 ## 1.d.iii
 #workdir=workdir/1.d.iii
@@ -80,6 +94,33 @@ COMMENT
 #tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
 #python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
 #    --out $workdir/results_e$epoch.pkl
+
+# 1.e.iv
+expid=1.e.iv
+workdir=workdir/$expid
+epoch=700
+config=configs/trainval/daotad/$expid.py
+tools/dist_trainval.sh $config "4,5,6,7" --workdir $workdir
+python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+    --out $workdir/results_e$epoch.pkl
+
+# 1.e.v
+expid=1.e.v
+workdir=workdir/$expid
+epoch=700
+config=configs/trainval/daotad/$expid.py
+tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+    --out $workdir/results_e$epoch.pkl
+
+# 1.e.vi
+expid=1.e.vi
+workdir=workdir/$expid
+epoch=700
+config=configs/trainval/daotad/$expid.py
+tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+    --out $workdir/results_e$epoch.pkl
 
 <<COMMENT
 # 2.a.ii

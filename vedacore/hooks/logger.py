@@ -41,7 +41,9 @@ class LoggerHook(BaseHook):
             log_items.append(f'{name}: {val}')
         log_str += ', '.join(log_items)
 
-        log_str += f'. max GPU mem: {torch.cuda.max_memory_allocated() /1024/1024}MB'
+        max_memory_allocated = torch.cuda.max_memory_allocated() / 1024 / 1024
+        max_memory_reserved = torch.cuda.max_memory_reserved() / 1024 / 1024
+        log_str += f'. max mem allocated: {max_memory_allocated} MB. max reservered: {max_memory_reserved} MB'
 
         looper.logger.info(log_str)
 

@@ -137,8 +137,12 @@ def main():
         res = data_loader.dataset.evaluate(results, **kwargs)
         mAPs.append(res["mAP"])
     mAP = np.mean(mAPs)
-    print(f"-----  checkpoint: {args.checkpoint} -----")
-    print(f"average mAP: {mAP}| mAPs: {mAPs}\n")
+
+    out_log_file = args.out + ".log"
+    log = f"-----  checkpoint: {args.checkpoint} -----\naverage mAP: {mAP}| mAPs: {mAPs}\n"
+    print(log)
+    with open(out_log_file, "a") as f:
+        f.write(log)
 
 
 if __name__ == "__main__":

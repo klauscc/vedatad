@@ -410,10 +410,10 @@ class TemporalRandomCrop(object):
             patch = np.array([[start, end]], dtype=np.float32)
 
             mask = self.get_valid_mask(results["gt_segments"], patch, self.iof_th)
-            if count < 20 and np.count_nonzero(mask) == 0:
-                continue
-            elif count >= 20:
-                print(results["video_info"], results["ann_info"], results["gt_segments"])
+            # if count < 20 and np.count_nonzero(mask) == 0:
+            #     continue
+            # elif count >= 20:
+            #     print(results["video_info"], results["ann_info"], results["gt_segments"])
 
             for key in results.get("segment_fields", []):
                 segments = results[key]
