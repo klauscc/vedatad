@@ -9,7 +9,13 @@ model = TimeSformer(
     pretrained_model="",
 )
 
+pretrained_model = (
+    "data/pretrained_models/timesformer/TimeSformer_divST_96x4_224_K600.pyth"
+)
+states = torch.load(pretrained_model)
+model.load_state_dict(states["model_state"])
 model.cuda()
+model.train()
 
 num_frames = 480
 

@@ -42,6 +42,11 @@ def generate_indices(num_frames, chunk_size, keep_ratio, mode):
 
     """
     num_chunks = num_frames // chunk_size
+    if keep_ratio == 0:
+        keep_indices = []
+        drop_indices = list(range(num_chunks))
+        return keep_indices, drop_indices
+
     if mode == "random":
         return random_selection(num_chunks, keep_ratio)
     if mode == "uniform":

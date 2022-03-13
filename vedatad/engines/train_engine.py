@@ -1,15 +1,17 @@
 import json
 import os
 from time import time
-from easydict import EasyDict
+
+import numpy as np
 import torch
+from easydict import EasyDict
+
 from vedacore.misc import registry
 from vedacore.optimizers import build_optimizer
 from vedatad.criteria import build_criterion
 from vedatad.partial_feedback.indice_selection import generate_indices
 from vedatad.partial_feedback.memory_bank import load_features, write_features
 from .base_engine import BaseEngine
-import numpy as np
 
 
 @registry.register_module("engine")
@@ -116,7 +118,7 @@ class MemBankTrainEngine(BaseEngine):
 
         ## shape: [B, num_keep_chunks, C, feat_chunk_size]
         t3 = time()
-        if not self.frozen:
+        if (not self.frozen) and len(keep_indices) != 0:
             update_feats = update_feats.detach().cpu().numpy()
             for i, video_meta in enumerate(video_metas):
                 video_name, tshift = video_meta["video_name"], video_meta["tshift"]

@@ -1,7 +1,8 @@
-from .resnet3d import ResNet3d
-from .vswin import SwinTransformer3D
 from .chunk_model import ChunkVideoSwin, ChunkVideoSwinWithChunkInput
-from .temp_graddrop import GradDropChunkVideoSwin, GradDropChunkVideoSwinV2
+from .resnet3d import ResNet3d
+from .temp_graddrop import (GradDropChunkVideoSwin, GradDropChunkVideoSwinV2,
+                            GradDropI3D, GradDropModel, GradDropTimeSformer)
+from .vswin import SwinTransformer3D
 
 __all__ = [
     "ResNet3d",
@@ -10,4 +11,7 @@ __all__ = [
     "ChunkVideoSwinWithChunkInput",
     "GradDropChunkVideoSwin",
     "GradDropChunkVideoSwinV2",
+    "GradDropModel",
+    "GradDropI3D",
+    "GradDropTimeSformer",
 ]

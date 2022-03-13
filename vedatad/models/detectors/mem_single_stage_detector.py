@@ -1,13 +1,13 @@
 from copy import deepcopy
+
+import numpy as np
 import torch
 import torch.nn as nn
-import numpy as np
 
 from vedacore.misc import registry
+from vedatad.partial_feedback import indice_selection
 from ..builder import build_backbone, build_head, build_neck
 from .base_detector import BaseDetector
-
-from vedatad.partial_feedback import indice_selection
 
 
 @registry.register_module("detector")
@@ -47,16 +47,20 @@ class MemSingleStageDetector(BaseDetector):
         num_bp_chunks = x.shape[0]
         num_nobp_chunks = frozen_features.shape[0]
         num_chunks = num_bp_chunks + num_nobp_chunks
-        bp_features = self.backbone(x)  # [num_keep_chunks, B, C, feat_chunk_size]
 
-        # compose features
-        feats = torch.zeros(
-            [num_chunks] + list(bp_features.shape[1:]),
-            dtype=bp_features.dtype,
-            device=bp_features.device,
-        )
-        feats[keep_indices] = bp_features
-        feats[drop_indices] = frozen_features
+        if len(keep_indices) != 0:
+            bp_features = self.backbone(x)  # [num_keep_chunks, B, C, feat_chunk_size]
+            # compose features
+            feats = torch.zeros(
+                [num_chunks] + list(bp_features.shape[1:]),
+                dtype=bp_features.dtype,
+                device=bp_features.device,
+            )
+            feats[keep_indices] = bp_features
+            feats[drop_indices] = frozen_features
+        else:
+            feats = frozen_features
+            bp_features = None
         ## [num_chunks, B, C, feat_chunk_size] -> [B, C, num_chunks*feat_chunk_size]
         num_chunks, B, C, feat_chunk_size = feats.shape
         feats = feats.permute(1, 2, 0, 3).reshape(B, C, num_chunks * feat_chunk_size)

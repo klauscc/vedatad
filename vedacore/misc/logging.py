@@ -43,7 +43,7 @@ def get_logger(name, log_file=None, log_level=logging.INFO):
     rank, _ = get_dist_info()
     # only rank 0 will add a FileHandler
     if rank == 0 and log_file is not None:
-        file_handler = logging.FileHandler(log_file, 'w')
+        file_handler = logging.FileHandler(log_file, 'a')
         handlers.append(file_handler)
 
     formatter = logging.Formatter(
