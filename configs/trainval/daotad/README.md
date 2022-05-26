@@ -36,6 +36,10 @@ ${vedatad_root}/tools/data/extract_frames.sh videos/test frames/test -vf fps=25 
 #fps8. 256x256
 ./tools/data/extract_frames.sh data/thumos14/videos/val data/thumos14/frames_8fps_256x256/val -vf fps=8 -s 256x256 %05d.png
 ./tools/data/extract_frames.sh data/thumos14/videos/test data/thumos14/frames_8fps_256x256/test -vf fps=8 -s 256x256 %05d.png
+
+#fps2. 256x256
+./tools/data/extract_frames.sh data/thumos14/videos/val data/thumos14/frames_2fps_256x256/val -vf fps=2 -s 256x256 %05d.png
+./tools/data/extract_frames.sh data/thumos14/videos/test data/thumos14/frames_2fps_256x256/test -vf fps=2 -s 256x256 %05d.png
 ```
 
 ## Train

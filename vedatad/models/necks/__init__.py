@@ -1,10 +1,9 @@
+from .attn_fpn import AttnFPN, AttnFPNNorm, DummyFPN
 from .fpn import FPN, SelfAttnFPN
-from .srm import SRM
+from .multi_scale import MultiScaleWrapper, ReshapeFeatures
+from .srm import SRM, SRMResizeFeature
 from .srm_vswin import SRMSwin, SRMSwinNorm
 from .tdm import TDM, MultiScaleTDM, SelfAttnTDM
-from .attn_fpn import AttnFPN, DummyFPN, AttnFPNNorm
-from .multi_scale import ReshapeFeatures, MultiScaleWrapper
-
 
 __all__ = [
     "FPN",
@@ -13,6 +12,7 @@ __all__ = [
     "MultiScaleTDM",
     "SelfAttnTDM",
     "SRM",
+    "SRMResizeFeature",
     "SRMSwin",
     "SRMSwinNorm",
     "AttnFPN",

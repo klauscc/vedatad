@@ -131,6 +131,8 @@ def main():
     # kwargs = dict() if args.eval_options is None else args.eval_options
 
     mAPs = []
+    video_acc = data_loader.dataset.evaluate_video_level_acc(results)
+    print(f"video level: {video_acc}")
     for iou_thr in iou_thrs:
         kwargs = dict(iou_thr=iou_thr)
         print(f"======iou_thr:{iou_thr}=====")

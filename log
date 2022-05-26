@@ -1,0 +1,249 @@
+
+
+times in msec
+ clock   self+sourced   self:  sourced script
+ clock   elapsed:              other lines
+
+000.023  000.023: --- NVIM STARTING ---
+001.667  001.644: locale set
+002.626  000.958: inits 1
+002.673  000.048: window checked
+008.885  006.212: parsing arguments
+009.407  000.521: expanding arguments
+009.518  000.111: inits 2
+010.211  000.693: init highlight
+010.213  000.002: waiting for UI
+013.831  003.618: done waiting for UI
+013.904  000.073: init screen for UI
+013.944  000.040: init default mappings
+014.249  000.305: init default autocommands
+025.813  000.035  000.035: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/ultisnips/ftdetect/snippets.vim
+025.980  000.016  000.016: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/vim-fugitive/ftdetect/fugitive.vim
+026.182  000.031  000.031: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/vimtex/ftdetect/cls.vim
+026.268  000.028  000.028: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/vimtex/ftdetect/tex.vim
+026.354  000.023  000.023: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/vimtex/ftdetect/tikz.vim
+026.952  009.519  009.386: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/filetype.vim
+027.312  000.020  000.020: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/filetype.vim
+027.677  000.048  000.048: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/ftplugin.vim
+028.168  000.028  000.028: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/filetype.vim
+028.614  000.053  000.053: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/indent.vim
+034.519  000.121  000.121: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/onedark.vim/autoload/onedark.vim
+055.180  021.447  021.326: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/onedark.vim/colors/onedark.vim
+076.918  062.307  031.191: sourcing /Users/klaus/.config/nvim/init.vim
+076.929  000.373: sourcing vimrc file(s)
+077.566  000.110  000.110: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/syntax/synload.vim
+077.659  000.577  000.467: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/syntax/syntax.vim
+081.618  000.401  000.401: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/plugin/gzip.vim
+081.765  000.055  000.055: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/plugin/health.vim
+082.166  000.261  000.261: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/plugin/man.vim
+083.803  000.213  000.213: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/pack/dist/opt/matchit/plugin/matchit.vim
+084.019  001.745  001.532: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/plugin/matchit.vim
+084.300  000.200  000.200: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/plugin/matchparen.vim
+085.002  000.623  000.623: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/plugin/netrwPlugin.vim
+085.400  000.017  000.017: sourcing /Users/klaus/.local/share/nvim/rplugin.vim
+085.410  000.271  000.254: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/plugin/rplugin.vim
+085.622  000.132  000.132: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/plugin/shada.vim
+085.740  000.035  000.035: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/plugin/spellfile.vim
+085.984  000.158  000.158: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/plugin/tarPlugin.vim
+086.176  000.104  000.104: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/plugin/tohtml.vim
+086.283  000.029  000.029: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/plugin/tutor.vim
+086.558  000.200  000.200: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/plugin/zipPlugin.vim
+137.178  000.040  000.040: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/opt/tabout.nvim/plugin/tabout.vim
+143.645  056.445  056.405: sourcing /Users/klaus/.config/nvim/plugin/packer_compiled.lua
+144.477  006.315: loading rtp plugins
+146.041  000.392  000.392: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/auto-session/plugin/auto-session.vim
+147.461  000.068  000.068: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/glow.nvim/plugin/glow.lua
+147.862  000.029  000.029: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/grammar-guard.nvim/plugin/grammar_guard.vim
+150.590  002.362  002.362: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/indent-blankline.nvim/plugin/indent_blankline.vim
+151.388  000.139  000.139: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/lightline.vim/plugin/lightline.vim
+155.284  003.242  003.242: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/lightspeed.nvim/plugin/lightspeed.vim
+157.341  001.097  001.097: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/nvim-cmp/plugin/cmp.lua
+157.867  000.118  000.118: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/nvim-lsp-installer/plugin/nvim-lsp-installer.vim
+158.605  000.076  000.076: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/nvim-lspconfig/plugin/lspconfig.vim
+159.302  000.043  000.043: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/nvim-web-devicons/plugin/nvim-web-devicons.vim
+160.093  000.049  000.049: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/plenary.nvim/plugin/plenary.vim
+160.894  000.165  000.165: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/telescope.nvim/plugin/telescope.vim
+161.435  000.156  000.156: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/trouble.nvim/plugin/trouble.vim
+162.524  000.080  000.080: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/ultisnips/autoload/UltiSnips/map_keys.vim
+162.607  000.543  000.463: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/ultisnips/plugin/UltiSnips.vim
+163.397  000.151  000.151: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/undotree/plugin/undotree.vim
+164.285  000.261  000.261: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/vim-arsync/plugin/vim-arsync.vim
+165.199  000.180  000.180: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/vim-commentary/plugin/commentary.vim
+167.025  001.190  001.190: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/vim-fugitive/plugin/fugitive.vim
+167.624  000.058  000.058: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/vim-pdf/plugin/vim-pdf.vim
+168.402  000.145  000.145: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/vim-rhubarb/plugin/rhubarb.vim
+169.195  000.055  000.055: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/vim-snippets/plugin/vimsnippets.vim
+170.540  000.306  000.306: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/vim-visual-multi/autoload/vm/plugs.vim
+171.303  000.208  000.208: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/vim-visual-multi/autoload/vm/maps.vim
+171.752  000.150  000.150: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/vim-visual-multi/autoload/vm/maps/all.vim
+172.977  003.128  002.464: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/vim-visual-multi/plugin/visual-multi.vim
+173.705  000.054  000.054: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/vimtex/plugin/vimtex.vim
+174.795  000.046  000.046: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/wildfire.vim/autoload/wildfire/triggers.vim
+175.031  000.716  000.670: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/wildfire.vim/plugin/wildfire.vim
+175.524  016.631: loading packages
+176.597  000.114  000.114: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/ultisnips/after/plugin/UltiSnips_after.vim
+177.674  000.661  000.661: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/cmp-buffer/after/plugin/cmp_buffer.lua
+178.486  000.331  000.331: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/cmp-cmdline/after/plugin/cmp_cmdline.lua
+179.060  000.201  000.201: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/
+
+times in msec
+ clock   self+sourced   self:  sourced script
+ clock   elapsed:              other lines
+
+000.010  000.010: --- NVIM STARTING ---
+001.105  001.095: locale set
+001.970  000.865: inits 1
+002.011  000.041: window checked
+005.813  003.802: parsing arguments
+006.140  000.327: expanding arguments
+006.214  000.074: inits 2
+006.659  000.445: init highlight
+006.660  000.001: waiting for UI
+009.260  002.600: done waiting for UI
+009.298  000.037: init screen for UI
+009.327  000.029: init default mappings
+009.544  000.217: init default autocommands
+019.644  000.026  000.026: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/fusion.vim
+019.740  000.023  000.023: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/gdresource.vim
+019.826  000.017  000.017: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/gdscript.vim
+019.906  000.016  000.016: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/glimmer.vim
+019.985  000.018  000.018: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/glsl.vim
+020.064  000.017  000.017: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/gowork.vim
+020.156  000.028  000.028: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/graphql.vim
+020.241  000.025  000.025: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/hack.vim
+020.332  000.030  000.030: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/hcl.vim
+020.414  000.020  000.020: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/heex.vim
+020.497  000.020  000.020: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/hjson.vim
+020.579  000.021  000.021: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/json5.vim
+020.669  000.026  000.026: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/ledger.vim
+020.754  000.022  000.022: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/nix.vim
+020.837  000.021  000.021: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/prisma.vim
+020.921  000.023  000.023: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/pug.vim
+021.019  000.030  000.030: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/ql.vim
+021.116  000.036  000.036: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/query.vim
+021.203  000.022  000.022: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/surface.vim
+021.288  000.022  000.022: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/teal.vim
+021.374  000.024  000.024: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/tlaplus.vim
+021.459  000.023  000.023: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/nvim-treesitter/ftdetect/yang.vim
+021.685  000.032  000.032: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/ultisnips/ftdetect/snippets.vim
+021.851  000.024  000.024: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/vim-fugitive/ftdetect/fugitive.vim
+022.092  000.055  000.055: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/vimtex/ftdetect/cls.vim
+022.191  000.033  000.033: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/vimtex/ftdetect/tex.vim
+022.279  000.029  000.029: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/vimtex/ftdetect/tikz.vim
+022.960  010.913  010.230: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/filetype.vim
+023.377  000.021  000.021: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/filetype.vim
+023.842  000.046  000.046: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/ftplugin.vim
+024.227  000.018  000.018: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/filetype.vim
+024.642  000.041  000.041: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/indent.vim
+031.329  000.127  000.127: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/onedark.vim/autoload/onedark.vim
+051.544  021.071  020.944: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/onedark.vim/colors/onedark.vim
+083.721  073.909  041.799: sourcing /Users/klaus/.config/nvim/init.vim
+083.732  000.278: sourcing vimrc file(s)
+084.327  000.099  000.099: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/syntax/synload.vim
+084.418  000.570  000.471: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/syntax/syntax.vim
+087.819  000.350  000.350: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/plugin/gzip.vim
+087.927  000.022  000.022: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/plugin/health.vim
+088.091  000.093  000.093: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/plugin/man.vim
+089.224  000.195  000.195: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/pack/dist/opt/matchit/plugin/matchit.vim
+089.439  001.267  001.072: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/plugin/matchit.vim
+089.695  000.178  000.178: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/plugin/matchparen.vim
+090.210  000.435  000.435: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/plugin/netrwPlugin.vim
+090.567  000.022  000.022: sourcing /Users/klaus/.local/share/nvim/rplugin.vim
+090.577  000.271  000.249: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/plugin/rplugin.vim
+090.780  000.119  000.119: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/plugin/shada.vim
+090.904  000.036  000.036: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/plugin/spellfile.vim
+091.149  000.158  000.158: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/plugin/tarPlugin.vim
+091.340  000.103  000.103: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/plugin/tohtml.vim
+091.454  000.030  000.030: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/plugin/tutor.vim
+091.783  000.248  000.248: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/plugin/zipPlugin.vim
+145.983  000.050  000.050: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/opt/tabout.nvim/plugin/tabout.vim
+151.904  059.780  059.729: sourcing /Users/klaus/.config/nvim/plugin/packer_compiled.lua
+152.820  005.430: loading rtp plugins
+154.494  000.405  000.405: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/auto-session/plugin/auto-session.vim
+155.683  000.062  000.062: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/glow.nvim/plugin/glow.lua
+155.966  000.035  000.035: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/grammar-guard.nvim/plugin/grammar_guard.vim
+157.825  001.514  001.514: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/indent-blankline.nvim/plugin/indent_blankline.vim
+158.346  000.130  000.130: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/lightline.vim/plugin/lightline.vim
+161.713  003.002  003.002: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/lightspeed.nvim/plugin/lightspeed.vim
+163.553  001.115  001.115: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/nvim-cmp/plugin/cmp.lua
+163.951  000.124  000.124: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/nvim-lsp-installer/plugin/nvim-lsp-installer.vim
+164.407  000.088  000.088: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/nvim-lspconfig/plugin/lspconfig.vim
+166.061  001.081  001.081: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/nvim-treesitter/plugin/nvim-treesitter.vim
+168.928  002.367  002.367: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/nvim-treesitter-textobjects/plugin/nvim-treesitter-textobjects.vim
+169.423  000.059  000.059: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/nvim-web-devicons/plugin/nvim-web-devicons.vim
+170.056  000.056  000.056: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/plenary.nvim/plugin/plenary.vim
+171.576  001.175  001.175: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/tagbar/plugin/tagbar.vim
+172.141  000.170  000.170: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/telescope.nvim/plugin/telescope.vim
+172.737  000.233  000.233: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/trouble.nvim/plugin/trouble.vim
+173.619  000.097  000.097: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/ultisnips/autoload/UltiSnips/map_keys.vim
+173.702  000.607  000.510: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/ultisnips/plugin/UltiSnips.vim
+174.268  000.198  000.198: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/undotree/plugin/undotree.vim
+174.904  000.270  000.270: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/vim-arsync/plugin/vim-arsync.vim
+175.441  000.185  000.185: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/vim-commentary/plugin/commentary.vim
+177.135  001.331  001.331: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/vim-fugitive/plugin/fugitive.vim
+177.607  000.068  000.068: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/vim-pdf/plugin/vim-pdf.vim
+178.150  000.183  000.183: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/vim-rhubarb/plugin/rhubarb.vim
+178.564  000.053  000.053: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/vim-snippets/plugin/vimsnippets.vim
+179.622  000.244  000.244: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/vim-visual-multi/autoload/vm/plugs.vim
+180.437  000.220  000.220: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/vim-visual-multi/autoload/vm/maps.vim
+180.946  000.160  000.160: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/vim-visual-multi/autoload/vm/maps/all.vim
+182.214  003.261  002.636: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/vim-visual-multi/plugin/visual-multi.vim
+182.760  000.078  000.078: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/vimtex/plugin/vimtex.vim
+183.660  000.052  000.052: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/wildfire.vim/autoload/wildfire/triggers.vim
+183.914  000.783  000.731: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/wildfire.vim/plugin/wildfire.vim
+184.255  012.800: loading packages
+185.513  000.135  000.135: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/ultisnips/after/plugin/UltiSnips_after.vim
+186.427  000.677  000.677: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/cmp-buffer/after/plugin/cmp_buffer.lua
+186.959  000.311  000.311: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/cmp-cmdline/after/plugin/cmp_cmdline.lua
+187.358  000.175  000.175: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/cmp-nvim-lsp/after/plugin/cmp_nvim_lsp.lua
+188.380  000.023  000.023: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/ultisnips/plugin/UltiSnips.vim
+188.902  000.126  000.126: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/cmp-nvim-ultisnips/autoload/cmp_nvim_ultisnips.vim
+189.054  001.482  001.332: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/cmp-nvim-ultisnips/after/plugin/cmp_nvim_ultisnips.lua
+189.600  000.325  000.325: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/cmp-path/after/plugin/cmp_path.lua
+190.001  000.189  000.189: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/cmp-spell/after/plugin/cmp-spell.lua
+190.179  002.631: loading after plugins
+190.190  000.011: inits 3
+195.877  005.687: reading ShaDa
+196.460  000.583: opening buffers
+197.258  000.458  000.458: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/lightline.vim/autoload/lightline.vim
+203.855  005.831  005.831: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/vim-fugitive/autoload/fugitive.vim
+205.502  000.083  000.083: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/lightline.vim/autoload/lightline/tab.vim
+206.361  000.220  000.220: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/lightline.vim/autoload/lightline/colorscheme.vim
+206.984  001.160  000.939: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/onedark.vim/autoload/lightline/colorscheme/onedark.vim
+210.100  006.108: BufEnter autocommands
+210.103  000.003: editing files in windows
+220.835  000.168  000.168: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/autoload/provider/pythonx.vim
+254.127  000.254  000.254: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/autoload/remote/host.vim
+254.243  034.089  033.667: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/autoload/provider/python3.vim
+254.789  035.439  001.350: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/ftplugin/python.vim
+257.857  000.165  000.165: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/indent/python.vim
+259.506  000.500  000.500: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/syntax/python.vim
+263.538  000.122  000.122: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/nvim-treesitter/autoload/nvim_treesitter.vim
+648.109  000.066  000.066: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/ftplugin/json.vim
+651.161  000.149  000.149: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/indent/json.vim
+652.740  000.460  000.460: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/syntax/json.vim
+20761.723  20550.338  20513.436: sourcing /Users/klaus/.local/share/nvim/sessions/%Users%klaus%My Drive%projects%video_understanding%temporal-action-detection%vedatad.vim
+20765.234  004.793: VimEnter autocommands
+20765.249  000.015: UIEnter autocommands
+20765.253  000.004: before starting main loop
+20801.902  036.649: first screen update
+20801.906  000.004: --- NVIM STARTED ---
+start/cmp-nvim-lsp/after/plugin/cmp_nvim_lsp.lua
+180.242  000.026  000.026: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/ultisnips/plugin/UltiSnips.vim
+181.396  001.965  001.939: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/cmp-nvim-ultisnips/after/plugin/cmp_nvim_ultisnips.lua
+182.071  000.307  000.307: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/cmp-path/after/plugin/cmp_path.lua
+182.571  000.170  000.170: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/cmp-spell/after/plugin/cmp-spell.lua
+182.859  003.586: loading after plugins
+182.871  000.012: inits 3
+188.385  005.514: reading ShaDa
+189.151  000.766: opening buffers
+189.954  000.436  000.436: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/lightline.vim/autoload/lightline.vim
+197.426  006.630  006.630: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/vim-fugitive/autoload/fugitive.vim
+199.143  000.069  000.069: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/lightline.vim/autoload/lightline/tab.vim
+200.004  000.285  000.285: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/lightline.vim/autoload/lightline/colorscheme.vim
+200.649  001.216  000.931: sourcing /Users/klaus/.local/share/nvim/site/pack/packer/start/onedark.vim/autoload/lightline/colorscheme/onedark.vim
+203.913  006.411: BufEnter autocommands
+203.917  000.004: editing files in windows
+575.483  000.061  000.061: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/ftplugin/json.vim
+578.229  000.140  000.140: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/indent/json.vim
+579.404  000.248  000.248: sourcing /usr/local/Cellar/neovim/0.6.1/share/nvim/runtime/syntax/json.vim

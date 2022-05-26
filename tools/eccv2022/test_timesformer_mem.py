@@ -1,27 +1,22 @@
 import torch
 from timesformer.models.vit import TimeSformer
 
+num_frames = 96
+
 model = TimeSformer(
-    img_size=112,
-    num_classes=400,
-    num_frames=480,
+    img_size=224,
+    num_classes=600,
+    num_frames=num_frames,
     attention_type="divided_space_time",
     pretrained_model="",
 )
 
-pretrained_model = (
-    "data/pretrained_models/timesformer/TimeSformer_divST_96x4_224_K600.pyth"
-)
-states = torch.load(pretrained_model)
-model.load_state_dict(states["model_state"])
 model.cuda()
-model.train()
 
-num_frames = 480
 
 for i in range(10):
     dummy_video = torch.randn(
-        1, 3, num_frames, 112, 112
+        1, 3, num_frames, 224, 224
     ).cuda()  # (batch x channels x frames x height x width)
     pred = model(dummy_video)
     loss = pred.mean()

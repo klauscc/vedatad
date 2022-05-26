@@ -113,8 +113,76 @@ tools/dist_trainval.sh $config "4,5,6,7" --workdir $workdir
 expid=6.b.ii.2
 workdir=workdir/eccv2022/$expid
 config=configs/trainval/daotad_eccv2022/$expid.py
+epoch=800
+# for epoch in 600 700 800 900 500 1000 400 300; do
+    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+        --out $workdir/results_e$epoch-chunk.pkl
+done
+
+# 6.b.ii.5
+expid=6.b.ii.5
+mkdir -p data/tmp/eccv2022/thumos14/memory_mechanism/$expid
+cp -r data/thumos14/memory_mechanism/feat_swinb_15fps_256x256_crop224x224 data/tmp/eccv2022/thumos14/memory_mechanism/$expid/
+workdir=workdir/eccv2022/$expid
+config=configs/trainval/daotad_eccv2022/$expid.py
+tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+# Testing chunk
+expid=6.b.ii.5
+workdir=workdir/eccv2022/$expid
+config=configs/trainval/daotad_eccv2022/$expid.py
+epoch=500
+# for epoch in 600 700 800 900 500 1000 400 300; do
+    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+        --out $workdir/results_e$epoch-chunk.pkl
+done
+
+# 6.b.ii.6
+expid=6.b.ii.6
+mkdir -p data/tmp/eccv2022/thumos14/memory_mechanism/$expid
+cp -r data/thumos14/memory_mechanism/feat_swinb_15fps_256x256_crop224x224 data/tmp/eccv2022/thumos14/memory_mechanism/$expid/
+workdir=workdir/eccv2022/$expid
+config=configs/trainval/daotad_eccv2022/$expid.py
+tools/dist_trainval.sh $config "4,5,6,7" --workdir $workdir
+# Testing chunk
+expid=6.b.ii.6
+workdir=workdir/eccv2022/$expid
+config=configs/trainval/daotad_eccv2022/$expid.py
 # epoch=900
 for epoch in 600 700 800 900 500 1000 400 300; do
+    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+        --out $workdir/results_e$epoch-chunk.pkl
+done
+
+# 7.b.i
+expid=7.b.i
+mkdir -p data/tmp/eccv2022/thumos14/memory_mechanism/$expid
+cp -r data/thumos14/memory_mechanism/timesformer_96x4_15fps_256x256_crop224x224 data/tmp/eccv2022/thumos14/memory_mechanism/$expid/
+workdir=workdir/eccv2022/$expid
+config=configs/trainval/daotad_eccv2022/$expid.py
+tools/dist_trainval.sh $config "0,1,2,3,4,5,6,7" --workdir $workdir
+# Testing chunk
+expid=7.b.i
+workdir=workdir/eccv2022/$expid
+config=configs/trainval/daotad_eccv2022/$expid.py
+epoch=700
+# for epoch in 600 700 500 400 800 900 1000 300; do
+    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+        --out $workdir/results_e$epoch-chunk.pkl
+done
+
+# 7.b.ii
+expid=7.b.ii
+mkdir -p data/tmp/eccv2022/thumos14/memory_mechanism/$expid
+cp -r data/thumos14/memory_mechanism/actionclip_vitb16_15fps_256x256_crop224x224 data/tmp/eccv2022/thumos14/memory_mechanism/$expid/
+workdir=workdir/eccv2022/$expid
+config=configs/trainval/daotad_eccv2022/$expid.py
+tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+# Testing chunk
+expid=7.b.ii
+workdir=workdir/eccv2022/$expid
+config=configs/trainval/daotad_eccv2022/$expid.py
+epoch=600
+# for epoch in 600 700 800 900 500 1000 400 300; do
     python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
         --out $workdir/results_e$epoch-chunk.pkl
 done

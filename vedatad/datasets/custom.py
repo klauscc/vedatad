@@ -1,9 +1,10 @@
 import os.path as osp
 import tempfile
-from collections import defaultdict
+from collections import Counter, defaultdict
 from copy import deepcopy
 
 import numpy as np
+from sklearn.metrics import top_k_accuracy_score
 from torch.utils.data import Dataset
 
 import vedacore.fileio as fileio
@@ -323,6 +324,33 @@ class CustomDataset(Dataset):
 
         return time_results
 
+    def evaluate_video_level_acc(self, results):
+        """TODO: Docstring for evaluate_video_level_accu.
+
+        Args:
+            results (list): Testing results of the dataset.
+
+        Returns: dict. {"top1": acc1, "top2":acc2}
+
+        """
+        annotations = [self.get_ann_info(i) for i in range(len(self))]
+        y_true = []
+        y_score = []
+        for anno, res in zip(annotations, results):
+            labels = anno["labels"]
+            v_label = Counter(labels).most_common()[0][0]
+            v_score = []
+            for preds in res:
+                if len(preds) == 0:
+                    v_score.append(0)
+                else:
+                    v_score.append(np.max(preds[:, 2]))
+            y_true.append(v_label)
+            y_score.append(v_score)
+        top1 = top_k_accuracy_score(y_true, y_score, k=1, labels=range(20))
+        top2 = top_k_accuracy_score(y_true, y_score, k=2, labels=range(20))
+        return {"top1":top1, "top2":top2}
+
     def evaluate(
         self,
         results,
@@ -368,7 +396,7 @@ class CustomDataset(Dataset):
             for anno, res in zip(annotations, results):
                 print("-----------------------------------")
                 print(f"label: {anno['labels']}")
-                print("anno:", anno, "\n") 
+                print("anno:", anno, "\n")
                 for i, pred in enumerate(res):
                     if len(pred) > 0:
                         print(f"{i}: {pred}")

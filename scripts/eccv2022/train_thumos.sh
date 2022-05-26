@@ -100,11 +100,11 @@ tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
 expid=6.a.i.1
 workdir=workdir/eccv2022/$expid
 config=configs/trainval/daotad_eccv2022/$expid.py
-#epoch=900
-for epoch in 600 700 800 900 400 500 1000; do
+epoch=700
+# for epoch in 600 700 800 900 400 500 1000; do
     python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
         --out $workdir/results_e$epoch-chunk.pkl
-done
+# done
 
 # 6.b.i.2
 expid=6.b.i.2
@@ -143,6 +143,37 @@ config=configs/trainval/daotad_eccv2022/$expid.py
 tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
 # Testing chunk
 expid=6.b.ii.1
+workdir=workdir/eccv2022/$expid
+config=configs/trainval/daotad_eccv2022/$expid.py
+#epoch=900
+for epoch in 600 700  400 500 800 900 1000; do
+    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+        --out $workdir/results_e$epoch-chunk.pkl
+done
+
+# 6.b.ii.3
+expid=6.b.ii.3
+workdir=workdir/eccv2022/$expid
+config=configs/trainval/daotad_eccv2022/$expid.py
+tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+# Testing chunk
+expid=6.b.ii.3
+workdir=workdir/eccv2022/$expid
+config=configs/trainval/daotad_eccv2022/$expid.py
+#epoch=900
+for epoch in 600 700  400 500 800 900 1000; do
+    python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
+        --out $workdir/results_e$epoch-chunk.pkl
+done
+
+# 6.b.ii.4
+sleep 3h
+expid=6.b.ii.4
+workdir=workdir/eccv2022/$expid
+config=configs/trainval/daotad_eccv2022/$expid.py
+tools/dist_trainval.sh $config "0,1,2,3" --workdir $workdir
+# Testing chunk
+expid=6.b.ii.4
 workdir=workdir/eccv2022/$expid
 config=configs/trainval/daotad_eccv2022/$expid.py
 #epoch=900
