@@ -5,10 +5,8 @@ from vedacore.misc import registry
 from vedacore.modules.bricks.conv_module import ConvModule
 from vedatad.models.modules.positional_encoding import PositionalEncoding
 from vedatad.models.modules.swin_1d import Encoder, EncoderLayer1D
-from vedatad.models.modules.transformer import (
-    TransformerEncoder,
-    TransformerEncoderLayer,
-)
+from vedatad.models.modules.transformer import (TransformerEncoder,
+                                                TransformerEncoderLayer)
 
 
 @registry.register_module("neck")
@@ -195,5 +193,3 @@ class Transformer1DRelPos(nn.Module):
         x = self.encoder(x)  # [B,D,C]
 
         return x.permute(0, 2, 1)  # [B,C,D]
-
-

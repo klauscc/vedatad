@@ -28,10 +28,11 @@ config=configs/trainval/daotad_eccv2022/rebuttal/$expid.py
 tools/dist_trainval.sh $config "4,5,6,7" --workdir $workdir
 # Testing chunk
 expid=r1.a.i
+prefix="eccv2022/rebuttal"
 workdir=workdir/$prefix/$expid
 config=configs/trainval/daotad_eccv2022/rebuttal/$expid.py
 # epoch=900
-for epoch in 600 700 800 900 500 1000 400 300; do
+for epoch in 600 700 800 500 900 1000 400 300; do
     python tools/test.py $config $workdir/epoch_${epoch}_weights.pth \
         --out $workdir/results_e$epoch-chunk.pkl
 done
